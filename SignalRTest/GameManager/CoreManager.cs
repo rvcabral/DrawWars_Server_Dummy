@@ -9,6 +9,7 @@ namespace SignalRTest.GameManager
     public static class CoreManager
     {
         public static List<GameSession> Sessions = new List<GameSession>();
+        private static Random random = new Random();
 
         public static Context inlist(string room, string connectionId)
         {
@@ -40,6 +41,11 @@ namespace SignalRTest.GameManager
             return new Context(session.SessionId, player.PlayerId);
         }
 
+        internal static string GetUiClient(Context context)
+        {
+            return Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault()?.UiClientConnection;
+        }
+
         internal static bool AllReady(Context context)
         {
             var session = Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault();
@@ -61,12 +67,20 @@ namespace SignalRTest.GameManager
                 .RoundDone = true;
         }
 
-        internal static void ResetRounDone(Context context)
+        internal static void ResetRounDone(Guid session)
         {
-            Sessions.Where(s => s.SessionId == context.Session)
+            Sessions.Where(s => s.SessionId == session)
                 .FirstOrDefault()
                 .players
                 .ForEach(p => p.RoundDone = false);
+        }
+        internal static void SetAllRounDone(Guid session)
+        {
+            Sessions.Where(s => s.SessionId == session)
+                .FirstOrDefault()
+                .players
+                .ForEach(p => p.RoundDone = true);
+            
         }
 
         internal static bool SetUserNickName(Context context, string nickname)
@@ -78,6 +92,39 @@ namespace SignalRTest.GameManager
             plr.nickname = nickname;
             return true;
 
+        }
+
+        internal static object NextPhase(Guid session)
+        {
+            var sess = Sessions.Where(s => s.SessionId == session).FirstOrDefault();
+            SetAllRounDone(session);
+            return sess.GamePhase;
+        }
+
+        internal static Guid RegisterUIClient(string connection)
+        {
+            var session = new GameSession
+            {
+                SessionId = Guid.NewGuid(),
+                GamePhase = Phases.Introduction,
+                Room = GenerateRoomCode(),
+                UiClientConnection = connection
+            };
+            Sessions.Add(session);
+            return session.SessionId;
+        }
+        
+        private static string GenerateRoomCode()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string newCode = "";
+            do
+            {
+                newCode = new string(Enumerable.Repeat(chars, 6)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+            }
+            while (Sessions.Any(s => s.Room == newCode));
+            return newCode;
         }
     }
 }

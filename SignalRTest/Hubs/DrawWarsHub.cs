@@ -22,7 +22,9 @@ namespace SignalRTest.Hubs
         {
             Console.WriteLine($"Player {context.PlayerId} from Session {context.Session} has set his nickname to {nickname}");
             var success = CoreManager.SetUserNickName(context, nickname);
-            await Clients.Caller.SendAsync("AckNickname", success);
+            await Clients.Caller.SendAsync("AckNickname");
+            string uiConId = CoreManager.GetUiClient(context);
+            await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
         }
 
         public async Task Ready(Context context)
@@ -30,7 +32,7 @@ namespace SignalRTest.Hubs
             CoreManager.SetRounDone(context);
             if (CoreManager.AllReady(context))
             {
-                CoreManager.ResetRounDone(context);
+                CoreManager.ResetRounDone(context.Session);
 
                 switch (CoreManager.GetSession(context).GamePhase)
                 {
@@ -61,10 +63,22 @@ namespace SignalRTest.Hubs
             return;
         }
 
-        /*public override Task OnConnectedAsync()
-        {
 
-            return base.OnConnectedAsync();
-        }*/
+        public async Task RegisterUIClient()
+        {
+            Guid session = CoreManager.RegisterUIClient(Context.ConnectionId);
+            await Clients.Caller.SendAsync("AckUIClient", session);
+        }
+        public async Task SetTimesUp(Guid session)
+        {
+            var res = CoreManager.NextPhase(session);
+            await Clients.Caller.SendAsync("setNextPhase", res);
+        }
+        public async Task SetNextPhase(Guid session)
+        {
+            var res = CoreManager.NextPhase(session);
+            await Clients.Caller.SendAsync("setNextPhase", res);
+        }
+
     }
 }

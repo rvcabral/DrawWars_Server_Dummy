@@ -12,6 +12,7 @@ namespace SignalRTest.Logic
         public Guid SessionId { get; set; }
         public List<Player> players;
         public Phases GamePhase { get; set; }
+        public string UiClientConnection  { get; set; }
 
         public Dictionary<Guid, List<string>> GetThemes()
         {
