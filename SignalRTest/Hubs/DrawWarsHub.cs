@@ -14,8 +14,17 @@ namespace SignalRTest.Hubs
         public async Task Inlist(string room)
         {
             Console.WriteLine($"Registering unto room {room}");
+           
             var res = CoreManager.inlist(room, Context.ConnectionId);
-            await Clients.Caller.SendAsync("AckSession", res);
+            if (res.Session.Equals(Guid.Empty))
+            {
+                await Clients.Caller.SendAsync("NonExistingSession", res.PlayerId);
+            }
+            else
+            {
+                await Clients.Caller.SendAsync("AckSession", res);
+            }
+            
         }
 
         public async Task SetPlayerNickName(Context context, string nickname)

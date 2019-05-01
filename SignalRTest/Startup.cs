@@ -52,6 +52,16 @@ namespace SignalRTest
             app.UseCookiePolicy();
 
             app.UseMvc();
+
+
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:8081/")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+            });
+
             app.UseSignalR(routes =>
             {
                 routes.MapHub<DrawWarsHub>("/Server");

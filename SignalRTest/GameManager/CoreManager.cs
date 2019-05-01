@@ -24,21 +24,9 @@ namespace SignalRTest.GameManager
             {
                 session = Sessions.Where(s => s.Room == room).FirstOrDefault();
                 session.players.Add(player);
+                return new Context(session.SessionId, player.PlayerId);
             }
-            
-            else
-            {
-                session = new GameSession
-                {
-                    Room = room,
-                    SessionId = Guid.NewGuid(),
-                    players = new List<Player>()
-                };
-                session.players.Add(player);
-                Sessions.Add(session);
-
-            }
-            return new Context(session.SessionId, player.PlayerId);
+            return new Context(Guid.Empty, player.PlayerId);
         }
 
         internal static string GetUiClient(Context context)
