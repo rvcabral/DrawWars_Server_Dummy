@@ -16,7 +16,15 @@ namespace SignalRTest.Logic
 
         public Dictionary<Guid, List<string>> GetThemes()
         {
-            return new Dictionary<Guid, List<string>>();
+            var themes = new Dictionary<Guid, List<string>>();
+            int counter = 1;
+            players.ForEach(p => themes.Add(p.PlayerId, new List<string> { $"Tema {counter++}" }));
+            return themes;
+        }
+
+        internal void setArt(Guid playerId, byte[] draw)
+        {
+            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(new Art(draw));
         }
     }
 }

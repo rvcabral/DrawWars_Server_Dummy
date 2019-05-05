@@ -33,12 +33,13 @@ namespace SignalRTest.Hubs
             var success = CoreManager.SetUserNickName(context, nickname);
             await Clients.Caller.SendAsync("AckNickname");
             string uiConId = CoreManager.GetUiClient(context);
-            await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
+            //await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
         }
 
         public async Task Ready(Context context)
         {
-            CoreManager.SetRounDone(context);
+            await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context).GetThemes());
+            /*CoreManager.SetRounDone(context);
             if (CoreManager.AllReady(context))
             {
                 CoreManager.ResetRounDone(context.Session);
@@ -68,10 +69,14 @@ namespace SignalRTest.Hubs
                 }
 
                 return;
-            }
+            }*/
             return;
         }
 
+        public async Task SetArt(Context context, byte[] draw)
+        {
+            CoreManager.GetSession(context).setArt(context.PlayerId, draw);
+        }
 
         public async Task RegisterUIClient()
         {

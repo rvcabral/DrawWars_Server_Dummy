@@ -61,3 +61,4 @@ C:\Users\admin\Documents\GitHub\DrawWars_Server_Dummy\SignalRTest\obj\Debug\netc
 C:\Users\admin\Documents\GitHub\DrawWars_Server_Dummy\SignalRTest\obj\Debug\netcoreapp2.1\SignalRTest.dll
 C:\Users\admin\Documents\GitHub\DrawWars_Server_Dummy\SignalRTest\obj\Debug\netcoreapp2.1\SignalRTest.pdb
 C:\Users\admin\Documents\GitHub\DrawWars_Server_Dummy\SignalRTest\obj\Debug\netcoreapp2.1\SignalRTest.csproj.CopyComplete
+C:\Users\admin\Documents\GitHub\DrawWars_Server_Dummy\SignalRTest\obj\Debug\netcoreapp2.1\SignalRTest.csprojAssemblyReference.cache

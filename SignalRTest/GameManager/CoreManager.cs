@@ -26,7 +26,19 @@ namespace SignalRTest.GameManager
                 session.players.Add(player);
                 return new Context(session.SessionId, player.PlayerId);
             }
-            return new Context(Guid.Empty, player.PlayerId);
+            else //DEBUG PURPOSE ONLY
+            {
+                session = new GameSession
+                {
+                    Room = room,
+                    SessionId = Guid.NewGuid(),
+                    players = new List<Player>()
+                };
+                session.players.Add(player);
+                Sessions.Add(session);
+                return new Context(session.SessionId, player.PlayerId);
+            }
+            //return new Context(Guid.Empty, player.PlayerId);
         }
 
         internal static string GetUiClient(Context context)
