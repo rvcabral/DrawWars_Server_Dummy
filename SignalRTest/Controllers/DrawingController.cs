@@ -16,10 +16,15 @@ namespace SignalRTest.Controllers
 
             var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}.{model.Extension}";
             var picture = Convert.FromBase64String(model.Drawing);
-
-            var uri = new AwsManager().S3_UploadFile(filename, picture);
-
-            return new { uri };
+            try
+            {
+                var uri = new AwsManager().S3_UploadFile(filename, picture);
+                return new { uri };
+            }
+            catch (Exception e)
+            {
+                return new { errorMessage = "crap." };
+            }
         }
     }
 }
