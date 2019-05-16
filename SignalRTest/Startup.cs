@@ -54,7 +54,7 @@ namespace SignalRTest
 
             app.UseCors(builder =>
             {
-                builder.WithOrigins("http://localhost:8081/")
+                builder.WithOrigins("http://localhost:8081")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();

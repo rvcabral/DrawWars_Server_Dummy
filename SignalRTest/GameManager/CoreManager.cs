@@ -101,19 +101,20 @@ namespace SignalRTest.GameManager
             return sess.GamePhase;
         }
 
-        internal static Guid RegisterUIClient(string connection)
+        internal static GameSession RegisterUIClient(string connection)
         {
             var session = new GameSession
             {
                 SessionId = Guid.NewGuid(),
                 GamePhase = Phases.Introduction,
                 Room = GenerateRoomCode(),
-                UiClientConnection = connection
+                UiClientConnection = connection,
+                players = new List<Player>()
             };
             Sessions.Add(session);
-            return session.SessionId;
+            return session;
         }
-        
+
         private static string GenerateRoomCode()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

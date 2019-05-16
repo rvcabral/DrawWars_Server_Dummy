@@ -33,7 +33,7 @@ namespace SignalRTest.Hubs
             var success = CoreManager.SetUserNickName(context, nickname);
             await Clients.Caller.SendAsync("AckNickname");
             string uiConId = CoreManager.GetUiClient(context);
-            //await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
+            await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
         }
 
         public async Task Ready(Context context)
@@ -80,8 +80,9 @@ namespace SignalRTest.Hubs
 
         public async Task RegisterUIClient()
         {
-            Guid session = CoreManager.RegisterUIClient(Context.ConnectionId);
-            await Clients.Caller.SendAsync("AckUIClient", session);
+            //Note, for now we don't support a page refresh on UI so we don't need to send sessionId
+            GameSession session = CoreManager.RegisterUIClient(Context.ConnectionId);
+            await Clients.Caller.SendAsync("AckUIClient", session.Room);
         }
         public async Task SetTimesUp(Guid session)
         {
