@@ -19,11 +19,11 @@ namespace SignalRTest.Controllers
             try
             {
                 var uri = new AwsManager().S3_UploadFile(filename, picture);
-                return new { uri };
+                return new { uri, errorMessage = string.Empty};
             }
             catch (Exception e)
             {
-                return new { errorMessage = "crap." };
+                return new { uri= string.Empty, errorMessage = "crap." };
             }
         }
     }
