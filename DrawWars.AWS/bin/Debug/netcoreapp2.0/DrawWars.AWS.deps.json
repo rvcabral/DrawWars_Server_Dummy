@@ -1,0 +1,53 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.0",
+    "signature": "972208a3e415d49a02cf69916ef28315d1e7d6c1"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.0": {
+      "DrawWars.Aws/1.0.0": {
+        "dependencies": {
+          "AWSSDK.S3": "3.3.101.17"
+        },
+        "runtime": {
+          "DrawWars.Aws.dll": {}
+        }
+      },
+      "AWSSDK.Core/3.3.101.10": {
+        "runtime": {
+          "lib/netstandard2.0/AWSSDK.Core.dll": {}
+        }
+      },
+      "AWSSDK.S3/3.3.101.17": {
+        "dependencies": {
+          "AWSSDK.Core": "3.3.101.10"
+        },
+        "runtime": {
+          "lib/netstandard2.0/AWSSDK.S3.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DrawWars.Aws/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AWSSDK.Core/3.3.101.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WEqUpsbUXaR7sv8G42hiZFtYaljtDHpDNOV5J4DI6UeyF4N9u2SNYxHFS7mkI45L3nLMl+tGJYYw663+27h7FA==",
+      "path": "awssdk.core/3.3.101.10",
+      "hashPath": "awssdk.core.3.3.101.10.nupkg.sha512"
+    },
+    "AWSSDK.S3/3.3.101.17": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vwV4tlww5ei1oqHvyNiIwhLjqk3QB3m1X6eR3K1YnoluP8LAOuTN3o4LQEje2NsGx20qGBF68IcoYehbxJYvDA==",
+      "path": "awssdk.s3/3.3.101.17",
+      "hashPath": "awssdk.s3.3.3.101.17.nupkg.sha512"
+    }
+  }
+}

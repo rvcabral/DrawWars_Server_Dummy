@@ -1,0 +1,9 @@
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\bin\Debug\netcoreapp2.1\DrawWars.Aws.deps.json
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\bin\Debug\netcoreapp2.1\DrawWars.Aws.dll
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\bin\Debug\netcoreapp2.1\DrawWars.Aws.pdb
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.csprojAssemblyReference.cache
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.AssemblyInfoInputs.cache
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.AssemblyInfo.cs
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.dll
+C:\Users\Utilizador\Desktop\DrawWars\Server\DrawWars_Server_Dummy\DrawWars.AWS\obj\Debug\netcoreapp2.1\DrawWars.Aws.pdb
