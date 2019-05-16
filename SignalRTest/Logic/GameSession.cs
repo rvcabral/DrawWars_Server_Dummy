@@ -7,7 +7,7 @@ namespace SignalRTest.Logic
 {
     public class GameSession
     {
-        private int MaxLotation = 6;
+        private const int MaxLotation = 6;
         public string Room { get; set; }
         public Guid SessionId { get; set; }
         public List<Player> players;

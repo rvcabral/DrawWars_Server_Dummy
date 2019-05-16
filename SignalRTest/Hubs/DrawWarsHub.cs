@@ -73,7 +73,7 @@ namespace SignalRTest.Hubs
             return;
         }
 
-        public async Task SetArt(Context context, byte[] draw)
+        public void SetArt(Context context, byte[] draw)
         {
             CoreManager.GetSession(context).setArt(context.PlayerId, draw);
         }
