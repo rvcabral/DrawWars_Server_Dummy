@@ -5,20 +5,21 @@ using System;
 
 namespace SignalRTest.Controllers
 {
+    [ApiController]
     [Route("api/drawing")]
     public class DrawingController : Controller
     {
-        [HttpPost]
-        public string Submit([FromBody] PictureUploadModel model)
+        [HttpPost("submit")]
+        public object Submit([FromBody] PictureUploadModel model)
         {
             //TODO Validate model.SessionID and model.PlayerID as 
 
-            var filename = $"{model.SessionID}{model.PlayerID}.{model.Extension}";
+            var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}.{model.Extension}";
             var picture = Convert.FromBase64String(model.Drawing);
 
             var uri = new AwsManager().S3_UploadFile(filename, picture);
 
-            return uri;
+            return new { uri };
         }
     }
 }

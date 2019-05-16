@@ -18,7 +18,7 @@ namespace DrawWars.Aws
         
         public AwsManager()
         {
-            _region = RegionEndpoint.EUWest2;
+            _region = RegionEndpoint.EUWest1;
         }
 
         public string S3_UploadFile(string fileName, byte[] file)
@@ -30,7 +30,7 @@ namespace DrawWars.Aws
                 using (var stream = new MemoryStream(file))
                 {
                     tu.Upload(stream, Bucket, fileName);
-                    return $"{CloudFront}/{fileName}";
+                    return $"http://{CloudFront}/{fileName}";
                 }
             }
             catch (Exception e)
