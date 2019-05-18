@@ -38,45 +38,10 @@ namespace SignalRTest.Hubs
 
         public async Task Ready(Context context)
         {
-            await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context).GetThemes());
-            /*CoreManager.SetRounDone(context);
-            if (CoreManager.AllReady(context))
-            {
-                CoreManager.ResetRounDone(context.Session);
-
-                switch (CoreManager.GetSession(context).GamePhase)
-                {
-                    case Phases.Introduction:
-                        {
-                            await Clients.All.SendAsync("NextStage");
-                            break;
-                        }
-                    case Phases.Draw:
-                        {
-                            await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context).GetThemes());
-                            break;
-                        }
-                    case Phases.Guess:
-                        {
-                            await Clients.All.SendAsync("GuessTitle");
-                            break;
-                        }
-                    case Phases.RoundEnd:
-                        {
-                            break;
-                        }
-
-                }
-
-                return;
-            }*/
-            return;
+            await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
         }
 
-        public void SetArt(Context context, byte[] draw)
-        {
-            CoreManager.GetSession(context).setArt(context.PlayerId, draw);
-        }
+
 
         public async Task RegisterUIClient()
         {
@@ -86,14 +51,13 @@ namespace SignalRTest.Hubs
         }
         public async Task SetTimesUp(Guid session)
         {
-            var res = CoreManager.NextPhase(session);
-            await Clients.Caller.SendAsync("setNextPhase", res);
+            var s = CoreManager.GetSession(session);
+            var uiC = s.UiClientConnection;
+            await Clients.Client(uiC).SendAsync("timesAsync");
+            foreach(var p in s.players)
+                await Clients.Client(p.ConnectionId).SendAsync("timesUp");
         }
-        public async Task SetNextPhase(Guid session)
-        {
-            var res = CoreManager.NextPhase(session);
-            await Clients.Caller.SendAsync("setNextPhase", res);
-        }
+        
 
     }
 }

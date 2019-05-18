@@ -41,6 +41,16 @@ namespace SignalRTest.GameManager
             //return new Context(Guid.Empty, player.PlayerId);
         }
 
+        internal static void setDraw(Context context, string uri)
+        {
+            Sessions.FirstOrDefault(s => s.SessionId == context.Session).setArt(context.PlayerId,uri);
+        }
+
+        internal static bool ValidContext(Context context)
+        {
+            return Sessions.Any(s => s.SessionId == context.Session && s.players.Any(p => p.PlayerId == context.PlayerId));
+        }
+
         internal static string GetUiClient(Context context)
         {
             return Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault()?.UiClientConnection;
@@ -52,9 +62,9 @@ namespace SignalRTest.GameManager
             return session.players.Count() == session.players.Where(p => p.RoundDone).Count();
         }
 
-        internal static GameSession GetSession(Context context)
+        internal static GameSession GetSession(Guid session)
         {
-            return Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault();
+            return Sessions.Where(s => s.SessionId == session).FirstOrDefault();
         }
 
         internal static void SetRounDone(Context context)
@@ -94,19 +104,13 @@ namespace SignalRTest.GameManager
 
         }
 
-        internal static object NextPhase(Guid session)
-        {
-            var sess = Sessions.Where(s => s.SessionId == session).FirstOrDefault();
-            SetAllRounDone(session);
-            return sess.GamePhase;
-        }
+        
 
         internal static GameSession RegisterUIClient(string connection)
         {
             var session = new GameSession
             {
                 SessionId = Guid.NewGuid(),
-                GamePhase = Phases.Introduction,
                 Room = GenerateRoomCode(),
                 UiClientConnection = connection,
                 players = new List<Player>()

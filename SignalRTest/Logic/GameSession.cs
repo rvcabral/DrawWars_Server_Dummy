@@ -11,7 +11,6 @@ namespace SignalRTest.Logic
         public string Room { get; set; }
         public Guid SessionId { get; set; }
         public List<Player> players;
-        public Phases GamePhase { get; set; }
         public string UiClientConnection  { get; set; }
 
         public Dictionary<Guid, List<string>> GetThemes()
@@ -22,9 +21,9 @@ namespace SignalRTest.Logic
             return themes;
         }
 
-        internal void setArt(Guid playerId, byte[] draw)
+        internal void setArt(Guid playerId, string draw)
         {
-            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(new Art(draw));
+            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(draw);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using DrawWars.Aws;
 using Microsoft.AspNetCore.Mvc;
+using SignalRTest.GameManager;
+using SignalRTest.Logic;
 using SignalRTest.Models;
 using System;
 
@@ -12,19 +14,24 @@ namespace SignalRTest.Controllers
         [HttpPost("submit")]
         public object Submit([FromBody] PictureUploadModel model)
         {
-            //TODO Validate model.SessionID and model.PlayerID as 
-
-            var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}.{model.Extension}";
-            var picture = Convert.FromBase64String(model.Drawing);
-            try
+            
+            var context = new Context(model.SessionID, model.PlayerID);
+            if (CoreManager.ValidContext(context))
             {
-                var uri = new AwsManager().S3_UploadFile(filename, picture);
-                return new { uri, errorMessage = string.Empty};
+                var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}.{model.Extension}";
+                var picture = Convert.FromBase64String(model.Drawing);
+                try
+                {
+                    var uri = new AwsManager().S3_UploadFile(filename, picture);
+                    CoreManager.setDraw(context, uri);
+                    return new { uri, errorMessage = string.Empty };
+                }
+                catch (Exception)
+                {
+                    return new { uri = string.Empty, errorMessage = "crap." };
+                }
             }
-            catch (Exception)
-            {
-                return new { uri= string.Empty, errorMessage = "crap." };
-            }
+            return new { uri = string.Empty, errorMessage = "Invalid Context" };
         }
     }
 }
