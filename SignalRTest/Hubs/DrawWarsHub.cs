@@ -57,7 +57,16 @@ namespace SignalRTest.Hubs
             foreach(var p in s.players)
                 await Clients.Client(p.ConnectionId).SendAsync("timesUp");
         }
-        
+
+        public async Task DrawSubmitted(Context context)
+        {
+            await Clients.Client(CoreManager.GetUiClient(context))
+                .SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
+                .players.Where(p => p.PlayerId == context.PlayerId)
+                .FirstOrDefault()
+                .Draws
+                .FirstOrDefault());
+        }
 
     }
 }
