@@ -12,6 +12,7 @@ namespace SignalRTest.Controllers
     public class DrawingController : Controller
     {
         [HttpPost("submit")]
+        [RequestSizeLimit(100_000_000)]
         public object Submit([FromBody] PictureUploadModel model)
         {
             
@@ -26,12 +27,32 @@ namespace SignalRTest.Controllers
                     CoreManager.setDraw(context, uri);
                     return new { uri, errorMessage = string.Empty };
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     return new { uri = string.Empty, errorMessage = "crap." };
                 }
             }
             return new { uri = string.Empty, errorMessage = "Invalid Context" };
+        }
+
+        [HttpGet("test")]
+        public object Test()
+        {
+
+            
+            return new { uri = string.Empty, Response = "Susexo" };
+        }
+
+        [HttpPost("ppp")]
+        public object ppp([FromBody] TEST t)
+        {
+
+
+            return new { uri = string.Empty, Response = "Susexo" };
+        }
+        public class TEST
+        {
+            public string T { get; set; }
         }
     }
 }

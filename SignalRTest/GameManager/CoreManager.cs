@@ -18,7 +18,8 @@ namespace SignalRTest.GameManager
             {
                 PlayerId = Guid.NewGuid(),
                 Points = 0,
-                ConnectionId = connectionId
+                ConnectionId = connectionId,
+                Draws = new List<string>()
             };
             if (Sessions.Any(s => s.Room == room))
             {
