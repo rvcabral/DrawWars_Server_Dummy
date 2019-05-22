@@ -60,22 +60,14 @@ namespace SignalRTest.Hubs
         public async Task DrawSubmitted(Context context)
         {
             //TODO: Apenas chamar front-end quando todos os desenhos tiverem sido recebidos.
-            //Implementar uma queue de desenhos, se são recebidos 5 mostrar os 5 antes de chamar GuessingOver
-            //Os critérios para mostrar o desenho seguinte são um timeout, enviado pelo cliente, ou todos os users acertarem
+            //Implementar uma queue de desenhos, se são recebidos 5 mostrar os 5
+            //Os critérios para mostrar o resultados são um timeout, enviado pelo cliente, ou todos os users acertarem
             await Clients.Client(CoreManager.GetUiClient(context))
                 .SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
                 .players.Where(p => p.PlayerId == context.PlayerId)
                 .FirstOrDefault()
                 .Draws
                 .FirstOrDefault());
-        }
-
-        //Este método poderá ser opcional para a beta.
-        public async Task DrawExpired()
-        {
-            //TODO: Chamado pelo front-end (FE), notifica o servidor que o tempo de desenho terminou (90 segundos?)
-            //Notificar o android, sendo forçado o envio do canvas actual, esteja ou não terminado.
-            //No fim chamar SendAsync("ShowDrawing") com o primeiro desenho.
         }
 
         public async Task SubmitGuess()
@@ -90,22 +82,12 @@ namespace SignalRTest.Hubs
              */
         }
 
-        //Este método poderá ser opcional para a beta.
-        public async Task GuessExpired()
-        {
-            //TODO: Chamado pelo front-end (FE), notifica o servidor para passar ao desenho seguinte,
-            //já que o tempo de guess terminou (90 segundos?)
-            //No fim chamar novamente SendAsync("ShowDrawing") com o desenho seguinte.
-        }
-
-        public async Task GuessingOver()
-        {
-            //TODO: Quando todos os desenhos, desta ronda, são mostrados notificar o front-end com a 
-            //pontuação global. Caso seja a última ronda chamar "GameFinished" em vez de "ShowScores"
-            /*
-              SendAsync("ShowScores", scores) scores -> {player1: 1, player2: 20, player3: 14...}
-             */
-        }
+        //Utilizar o ShowScores no contexto de outro método para notificar o front-end
+        //Adicionar um boolean na resposta para avisar quando o jogo tiver terminado
+        //e colocar no android um botão de NewGame
+        /*
+            SendAsync("ShowScores", scores) scores -> {player1: 1, player2: 20, player3: 14...}
+            */
 
         //Recomendo não haver nova ronda, para o beta. No entanto se for para suportar,
         //no fim do ScoreBoard ter sido mostrado, por exemplo após 10 segundos, contados pelo servidor,
@@ -119,24 +101,14 @@ namespace SignalRTest.Hubs
              */
         }
 
-        public async Task GameFinished()
-        {
-            //TODO: Chamar sempre este método no fim do jogo. Caso haja rondas, apenas chamar quando todas
-            //tiverem terminado. Mostrar no FE o scoreboard final e no android um botão de NewGame
-            /*
-              SendAsync("GameFinished", scores) -> scores -> {player1: 1, player2: 20, player3: 14...}
-             */
-        }
 
         public async Task NewGame()
         {
             //TODO: Metodo chamado pelo android quando 1 jogo termina e o user quer jogar novamente.
-            //Notificar o FE do sucedido de forma a ser enviado para a página de join, com um novo
-            //room code.
+            //Notificar o FE do sucedido de forma a ser enviado para a de start drawing
             /*
               SendAsync("NewGame", roomCode)
              */
         }
-
     }
 }
