@@ -24,7 +24,7 @@ namespace SignalRTest.Controllers
                 try
                 {
                     var uri = new AwsManager().S3_UploadFile(filename, picture);
-                    CoreManager.setDraw(context, uri);
+                    CoreManager.setDraw(context, uri, model.Theme);
                     return new { uri, errorMessage = string.Empty };
                 }
                 catch (Exception e)
@@ -35,24 +35,5 @@ namespace SignalRTest.Controllers
             return new { uri = string.Empty, errorMessage = "Invalid Context" };
         }
 
-        [HttpGet("test")]
-        public object Test()
-        {
-
-            
-            return new { uri = string.Empty, Response = "Susexo" };
-        }
-
-        [HttpPost("ppp")]
-        public object ppp([FromBody] TEST t)
-        {
-
-
-            return new { uri = string.Empty, Response = "Susexo" };
-        }
-        public class TEST
-        {
-            public string T { get; set; }
-        }
     }
 }

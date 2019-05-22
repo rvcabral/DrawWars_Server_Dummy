@@ -12,6 +12,7 @@ namespace SignalRTest.Logic
         public Guid SessionId { get; set; }
         public List<Player> players;
         public string UiClientConnection  { get; set; }
+        public string currentTheme { get; set; }
 
         public Dictionary<Guid, List<string>> GetThemes()
         {
@@ -21,9 +22,18 @@ namespace SignalRTest.Logic
             return themes;
         }
 
-        internal void setArt(Guid playerId, string draw)
+        internal void setArt(Guid playerId, string draw, string theme)
         {
-            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(draw);
+            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(new Draw(draw,theme));
+        }
+
+        public string nextDraw()
+        {
+            var d = players.Where(p => p.Draws.FirstOrDefault().Shown == false).FirstOrDefault()?.Draws.FirstOrDefault();
+            if (d == null) return "";
+            currentTheme = d.Theme;
+            d.Shown = true;
+            return d.DrawUri;
         }
     }
 }

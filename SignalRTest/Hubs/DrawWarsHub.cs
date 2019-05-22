@@ -62,24 +62,40 @@ namespace SignalRTest.Hubs
             //TODO: Apenas chamar front-end quando todos os desenhos tiverem sido recebidos.
             //Implementar uma queue de desenhos, se são recebidos 5 mostrar os 5
             //Os critérios para mostrar o resultados são um timeout, enviado pelo cliente, ou todos os users acertarem
-            await Clients.Client(CoreManager.GetUiClient(context))
+
+            if (CoreManager.AllDrawsSubmitted(context))
+            {
+                foreach (var p in CoreManager.GetSession(context.Session).players)
+                {
+                    await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess");
+                }
+
+                await Clients.Client(CoreManager.GetUiClient(context))
                 .SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
                 .players.Where(p => p.PlayerId == context.PlayerId)
                 .FirstOrDefault()
                 .Draws
                 .FirstOrDefault());
+                
+            }
+
+            
         }
 
-        public async Task SubmitGuess()
+        //Para ja não é preciso ser enviada uma cor, no entanto futuramente as cores irão 
+        //servir para indicar ao player quão próximo está, ou não, da resposta certa.
+        //Podera ser cor ou um enum que depois é interpretado no FE aplicando a respectiva cor.
+        /*
+          SendAsync("DisplayGuess", userGuess) userGuess -> {userName: "Briceno", guess: "GoT", isCorrect: false, color: "#000"}
+         */
+        public async Task SendGuess(Context context, string guess)
         {
-            //TODO: Cada guess do Android é recebida e enviada para a respectiva sessão
-            //sendo validada pelo servidor se é ou não a correta.
-            //Para ja não é preciso ser enviada uma cor, no entanto futuramente as cores irão 
-            //servir para indicar ao player quão próximo está, ou não, da resposta certa.
-            //Podera ser cor ou um enum que depois é interpretado no FE aplicando a respectiva cor.
-            /*
-              SendAsync("DisplayGuess", userGuess) userGuess -> {userName: "Briceno", guess: "GoT", isCorrect: false, color: "#000"}
-             */
+
+            var currGuess = CoreManager.GetSession(context.Session).currentTheme;
+            if (guess.ToLower().Trim() == currGuess.ToLower().Trim())
+                await Clients.Caller.SendAsync("RightGuess");
+            else
+                await Clients.Caller.SendAsync("WrongGuess");
         }
 
         //Utilizar o ShowScores no contexto de outro método para notificar o front-end

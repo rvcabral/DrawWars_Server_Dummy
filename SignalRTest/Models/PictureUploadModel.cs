@@ -16,5 +16,8 @@ namespace SignalRTest.Models
 
         [Required]
         public string Extension { get; set; }
+
+        [Required]
+        public string Theme { get; set; }
     }
 }

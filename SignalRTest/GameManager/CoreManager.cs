@@ -19,7 +19,7 @@ namespace SignalRTest.GameManager
                 PlayerId = Guid.NewGuid(),
                 Points = 0,
                 ConnectionId = connectionId,
-                Draws = new List<string>()
+                Draws = new List<Draw>()
             };
             if (Sessions.Any(s => s.Room == room))
             {
@@ -42,9 +42,9 @@ namespace SignalRTest.GameManager
             //return new Context(Guid.Empty, player.PlayerId);
         }
 
-        internal static void setDraw(Context context, string uri)
+        internal static void setDraw(Context context, string uri, string Theme)
         {
-            Sessions.FirstOrDefault(s => s.SessionId == context.Session).setArt(context.PlayerId,uri);
+            Sessions.FirstOrDefault(s => s.SessionId == context.Session).setArt(context.PlayerId,uri, Theme);
         }
 
         internal static bool ValidContext(Context context)
@@ -76,6 +76,12 @@ namespace SignalRTest.GameManager
                 .Where(p => p.PlayerId == context.PlayerId)
                 .FirstOrDefault()
                 .RoundDone = true;
+        }
+
+        internal static bool AllDrawsSubmitted(Context context)
+        {
+            var session = GetSession(context.Session);
+            return !session.players.Any(p => p.Draws.Count == 0);
         }
 
         internal static void ResetRounDone(Guid session)
