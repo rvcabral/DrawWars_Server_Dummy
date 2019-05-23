@@ -12,7 +12,6 @@ namespace SignalRTest.Controllers
     public class DrawingController : Controller
     {
         [HttpPost("submit")]
-        [RequestSizeLimit(100_000_000)]
         public object Submit([FromBody] PictureUploadModel model)
         {
             
@@ -35,5 +34,7 @@ namespace SignalRTest.Controllers
             return new { uri = string.Empty, errorMessage = "Invalid Context" };
         }
 
+        [HttpGet("time")]
+        public DateTimeOffset GetTime() => DateTimeOffset.UtcNow;
     }
 }
