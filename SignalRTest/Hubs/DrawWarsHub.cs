@@ -62,20 +62,21 @@ namespace SignalRTest.Hubs
             //TODO: Apenas chamar front-end quando todos os desenhos tiverem sido recebidos.
             //Implementar uma queue de desenhos, se são recebidos 5 mostrar os 5
             //Os critérios para mostrar o resultados são um timeout, enviado pelo cliente, ou todos os users acertarem
-
+            CoreManager.GetSession(context.Session).nextDraw();
             if (CoreManager.AllDrawsSubmitted(context))
             {
+                System.Threading.Thread.Sleep(1000);
                 foreach (var p in CoreManager.GetSession(context.Session).players)
                 {
                     await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess");
                 }
 
-                await Clients.Client(CoreManager.GetUiClient(context))
-                .SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
-                .players.Where(p => p.PlayerId == context.PlayerId)
-                .FirstOrDefault()
-                .Draws
-                .FirstOrDefault());
+                //await Clients.Client(CoreManager.GetUiClient(context))
+                //.SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
+                //.players.Where(p => p.PlayerId == context.PlayerId)
+                //.FirstOrDefault()
+                //.Draws
+                //.FirstOrDefault());
                 
             }
 
