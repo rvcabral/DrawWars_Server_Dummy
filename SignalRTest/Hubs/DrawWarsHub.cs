@@ -55,6 +55,7 @@ namespace SignalRTest.Hubs
 
         private async void CountTimeOut(int timeout, string cb, Context context)
         {
+            var connectionContext = this.Context;
             Thread.Sleep(timeout);
             await Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync(cb);
         }
