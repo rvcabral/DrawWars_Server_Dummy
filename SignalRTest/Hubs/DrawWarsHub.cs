@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using SignalRTest.GameManager;
@@ -38,7 +39,24 @@ namespace SignalRTest.Hubs
 
         public async Task Ready(Context context)
         {
-            await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
+            var timeout = DateTime.Now.AddMinutes(1);
+            //await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
+            var connections = CoreManager.GetContextConnectionIds(context);
+            await Clients.Clients(connections).SendAsync("DrawThemes", new {
+                themes = CoreManager.GetSession(context.Session).GetThemes(),
+                timeout
+            });
+
+            new Thread(() =>
+            {
+                this.CountTimeOut(60 * 1000, "Timeout", context);
+            }).Start();
+        }
+
+        private async void CountTimeOut(int timeout, string cb, Context context)
+        {
+            Thread.Sleep(timeout);
+            await Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync(cb);
         }
 
         public async Task RegisterUIClient()
@@ -65,22 +83,65 @@ namespace SignalRTest.Hubs
             CoreManager.GetSession(context.Session).nextDraw();
             if (CoreManager.AllDrawsSubmitted(context))
             {
-                System.Threading.Thread.Sleep(1000);
-                foreach (var p in CoreManager.GetSession(context.Session).players)
+                var timeout = DateTime.Now.AddMinutes(1);
+
+                new Thread(async () =>
                 {
-                    await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess");
-                }
+                    Thread.Sleep(2000);
 
-                //await Clients.Client(CoreManager.GetUiClient(context))
-                //.SendAsync("ShowDrawing", CoreManager.GetSession(context.Session)
-                //.players.Where(p => p.PlayerId == context.PlayerId)
-                //.FirstOrDefault()
-                //.Draws
-                //.FirstOrDefault());
-                
+                    foreach (var p in CoreManager.GetSession(context.Session).players)
+                        await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess", timeout);
+
+                    await Clients.Client(CoreManager.GetUiClient(context))
+                    .SendAsync("ShowDrawing", new {
+                        drawUrl = CoreManager.GetSession(context.Session)
+                            .players.Where(p => p.PlayerId == context.PlayerId)
+                            .FirstOrDefault()
+                            .Draws
+                            .FirstOrDefault(),
+                        timeout}
+                    );
+
+                    Thread.Sleep((int)(timeout - DateTime.Now).TotalSeconds * 1000);
+                    if (!CoreManager.AllGuessedCorrectly(context))
+                        await NextGamePhase(context);
+
+                }).Start();
             }
+        }
 
-            
+        public async Task NextGamePhase(Context context)
+        {
+            var timeout = DateTime.Now.AddSeconds(15);
+            await Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync("SeeResults", timeout);
+            new Thread(async () =>
+            {
+                Thread.Sleep((int)(timeout - DateTime.Now).TotalSeconds * 1000);
+                if (!string.IsNullOrWhiteSpace(CoreManager.GetSession(context.Session).nextDraw()))
+                {
+                    var newDrawingTimeout = DateTime.Now.AddMinutes(1);
+
+                    foreach (var p in CoreManager.GetSession(context.Session).players)
+                        await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess", timeout);
+
+                    await Clients.Client(CoreManager.GetUiClient(context))
+                    .SendAsync("ShowDrawing", new
+                    {
+                        drawUrl = CoreManager.GetSession(context.Session)
+                            .players.Where(p => p.PlayerId == context.PlayerId && p.Draws.FirstOrDefault().Shown == false)
+                            .FirstOrDefault()?
+                            .Draws
+                            .FirstOrDefault(),
+                        newDrawingTimeout
+                    });
+
+                    Thread.Sleep((int)(newDrawingTimeout - DateTime.Now).TotalSeconds * 1000);
+                    if (!CoreManager.AllGuessedCorrectly(context))
+                        await NextGamePhase(context);
+                }
+                else
+                    await Clients.All.SendAsync("EndOfGame");
+            });
         }
 
         //Para ja não é preciso ser enviada uma cor, no entanto futuramente as cores irão 
@@ -94,9 +155,28 @@ namespace SignalRTest.Hubs
 
             var currGuess = CoreManager.GetSession(context.Session).currentTheme;
             if (guess.ToLower().Trim() == currGuess.ToLower().Trim())
+            {
+                await Clients.Client(CoreManager.GetSession(context.Session).UiClientConnection).SendAsync("PlayerGuess", new {
+                    guess,
+                    isCorrect = true,
+                    player = CoreManager.GetSession(context.Session).players.FirstOrDefault(p => p.PlayerId == context.PlayerId).nickname
+                });
+
                 await Clients.Caller.SendAsync("RightGuess");
+                if (CoreManager.AllGuessedCorrectly(context))
+                    await NextGamePhase(context);
+            }
             else
+            {
+                await Clients.Client(CoreManager.GetSession(context.Session).UiClientConnection).SendAsync("PlayerGuess", new
+                {
+                    guess,
+                    isCorrect = false,
+                    player = CoreManager.GetSession(context.Session).players.FirstOrDefault(p => p.PlayerId == context.PlayerId).nickname
+                });
                 await Clients.Caller.SendAsync("WrongGuess");
+            }
+
         }
 
         //Utilizar o ShowScores no contexto de outro método para notificar o front-end

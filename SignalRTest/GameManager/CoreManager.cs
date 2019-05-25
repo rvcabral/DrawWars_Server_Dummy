@@ -126,6 +126,24 @@ namespace SignalRTest.GameManager
             return session;
         }
 
+        internal static bool AllGuessedCorrectly(Context context)
+        {
+           return true;
+        }
+
+        internal static List<string> GetContextConnectionIds(Context context)
+        {
+            var session = GetSession(context.Session);
+            List<string> connections = new List<string>();
+
+            connections.Add(session.UiClientConnection);
+            session.players.ForEach(p => {
+                connections.Add(p.ConnectionId);
+            });
+
+            return connections;
+        }
+
         private static string GenerateRoomCode()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
