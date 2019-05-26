@@ -47,15 +47,15 @@ namespace SignalRTest.Hubs
                 timeout
             });
 
-            new Thread(() =>
-            {
-                this.CountTimeOut(60 * 1000, "Timeout", context);
-            }).Start();
+            //new Thread(() =>
+            //{
+            //    this.CountTimeOut(60 * 1000, "Timeout", context);
+            //}).Start();
         }
 
         private async void CountTimeOut(int timeout, string cb, Context context)
         {
-            var connectionContext = this.Context;
+            //var connectionContext = this.Context;
             Thread.Sleep(timeout);
             await Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync(cb);
         }
@@ -86,28 +86,42 @@ namespace SignalRTest.Hubs
             {
                 var timeout = DateTime.Now.AddMinutes(1);
 
-                new Thread(async () =>
+                foreach (var p in CoreManager.GetSession(context.Session).players)
+                    await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess", timeout);
+
+                await Clients.Client(CoreManager.GetUiClient(context))
+                .SendAsync("ShowDrawing", new
                 {
-                    Thread.Sleep(2000);
+                    drawUrl = CoreManager.GetSession(context.Session)
+                        .players.Where(p => p.PlayerId == context.PlayerId)
+                        .FirstOrDefault()
+                        .Draws
+                        .FirstOrDefault(),
+                    timeout
+                });
 
-                    foreach (var p in CoreManager.GetSession(context.Session).players)
-                        await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess", timeout);
+                //new Thread(async () =>
+                //{
+                //    Thread.Sleep(2000);
 
-                    await Clients.Client(CoreManager.GetUiClient(context))
-                    .SendAsync("ShowDrawing", new {
-                        drawUrl = CoreManager.GetSession(context.Session)
-                            .players.Where(p => p.PlayerId == context.PlayerId)
-                            .FirstOrDefault()
-                            .Draws
-                            .FirstOrDefault(),
-                        timeout}
-                    );
+                //    foreach (var p in CoreManager.GetSession(context.Session).players)
+                //        await Clients.Client(p.ConnectionId).SendAsync("TryAndGuess", timeout);
 
-                    Thread.Sleep((int)(timeout - DateTime.Now).TotalSeconds * 1000);
-                    if (!CoreManager.AllGuessedCorrectly(context))
-                        await NextGamePhase(context);
+                //    await Clients.Client(CoreManager.GetUiClient(context))
+                //    .SendAsync("ShowDrawing", new {
+                //        drawUrl = CoreManager.GetSession(context.Session)
+                //            .players.Where(p => p.PlayerId == context.PlayerId)
+                //            .FirstOrDefault()
+                //            .Draws
+                //            .FirstOrDefault(),
+                //        timeout}
+                //    );
 
-                }).Start();
+                //    Thread.Sleep((int)(timeout - DateTime.Now).TotalSeconds * 1000);
+                //    if (!CoreManager.AllGuessedCorrectly(context))
+                //        await NextGamePhase(context);
+
+                //}).Start();
             }
         }
 
