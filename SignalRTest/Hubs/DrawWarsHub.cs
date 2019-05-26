@@ -11,6 +11,14 @@ namespace SignalRTest.Hubs
 {
     public class DrawWarsHub : Hub
     {
+        IHubContext<DrawWarsHub> _hubContext = null;
+
+        public override Task OnConnectedAsync()
+        {
+            var teste = base.Context;
+            return base.OnConnectedAsync();
+
+        }
 
         public async Task Inlist(string room)
         {
@@ -42,6 +50,7 @@ namespace SignalRTest.Hubs
             var timeout = DateTime.Now.AddMinutes(1);
             //await Clients.All.SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
             var connections = CoreManager.GetContextConnectionIds(context);
+
             await Clients.Clients(connections).SendAsync("DrawThemes", new {
                 themes = CoreManager.GetSession(context.Session).GetThemes(),
                 timeout
@@ -55,9 +64,9 @@ namespace SignalRTest.Hubs
 
         private async void CountTimeOut(int timeout, string cb, Context context)
         {
-            var connectionContext = this.Context;
+            
             Thread.Sleep(timeout);
-            await Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync(cb);
+            await _hubContext.Clients.Clients(CoreManager.GetContextConnectionIds(context)).SendAsync(cb);
         }
 
         public async Task RegisterUIClient()
