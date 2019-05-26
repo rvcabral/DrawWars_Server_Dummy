@@ -72,7 +72,7 @@ namespace SignalRTest.Hubs
             if (CoreManager.AllDrawsSubmitted(context))
             {
                 await DrawPhaseLogic(context.Session);
-                await Clients.Clients(CoreManager.GetUiClient(context.Session)).SendAsync("ReadyToShowDraws");
+                await Clients.Clients(CoreManager.GetUiClient(context.Session)).SendAsync("ReadyToShowDraws", 5);
             }
         }
 
