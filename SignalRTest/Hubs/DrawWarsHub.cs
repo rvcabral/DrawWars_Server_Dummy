@@ -12,13 +12,6 @@ namespace SignalRTest.Hubs
     public class DrawWarsHub : Hub
     {
         
-        public override Task OnConnectedAsync()
-        {
-            var teste = base.Context;
-            return base.OnConnectedAsync();
-
-        }
-
         #region Pre game phase
 
         public async Task Inlist(string room)
@@ -79,6 +72,7 @@ namespace SignalRTest.Hubs
             if (CoreManager.AllDrawsSubmitted(context))
             {
                 await DrawPhaseLogic(context.Session);
+                await Clients.Clients(CoreManager.GetUiClient(context.Session)).SendAsync("ReadyToShowDraws");
             }
         }
 
