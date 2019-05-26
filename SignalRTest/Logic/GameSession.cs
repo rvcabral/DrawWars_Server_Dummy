@@ -39,5 +39,15 @@ namespace SignalRTest.Logic
         {
             return players.Any(p => p.Draws.Any(d => d.Shown == false));
         }
+
+        internal void ResetPlayerGuesses()
+        {
+            players.ForEach(p => p.GuessedCorrectly = false);
+        }
+
+        internal void PlayerGuessedCorrectly(Guid playerId)
+        {
+            players.Find(p => p.PlayerId == playerId).GuessedCorrectly = true;
+        }
     }
 }

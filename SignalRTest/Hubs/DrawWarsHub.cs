@@ -70,7 +70,7 @@ namespace SignalRTest.Hubs
             var s = CoreManager.GetSession(session);
             var uiC = s.UiClientConnection;
             
-            await Clients.Clients(CoreManager.GetSession(session).players.Select(p=>p.ConnectionId).ToList()).SendAsync("timesUp");
+            await Clients.Clients(CoreManager.GetSession(session).players.Select(p=>p.ConnectionId).ToList()).SendAsync("TimesUp");
         }
 
         public async Task DrawSubmitted(Context context)
@@ -87,6 +87,7 @@ namespace SignalRTest.Hubs
             var nextDraw = CoreManager.GetSession(session).nextDraw();
             if (!string.IsNullOrWhiteSpace(nextDraw))
             {
+                CoreManager.GetSession(session).ResetPlayerGuesses();
                 await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("TryAndGuess");
                 await Clients.Client(CoreManager.GetUiClient(session))
                 .SendAsync("ShowDrawing", new
@@ -123,6 +124,7 @@ namespace SignalRTest.Hubs
             var currGuess = CoreManager.GetSession(context.Session).currentTheme;
             if (guess.ToLower().Trim() == currGuess.ToLower().Trim())
             {
+                CoreManager.GetSession(context.Session).PlayerGuessedCorrectly(context.PlayerId);
                 await Clients.Client(CoreManager.GetSession(context.Session).UiClientConnection).SendAsync("PlayerGuess", new
                 {
                     guess,

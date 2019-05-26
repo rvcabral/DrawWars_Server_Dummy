@@ -133,7 +133,7 @@ namespace SignalRTest.GameManager
 
         internal static bool AllGuessedCorrectly(Context context)
         {
-           return true;
+            return !GetSession(context.Session).players.Any(p => p.GuessedCorrectly == false);
         }
 
         internal static List<string> GetContextConnectionIds(Context context)

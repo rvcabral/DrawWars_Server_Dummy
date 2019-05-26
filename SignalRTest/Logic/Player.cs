@@ -11,5 +11,6 @@ namespace SignalRTest.Logic
         public string nickname { get; set; }
         public List<Draw> Draws { get; set; }
         public bool RoundDone { get; set; }
+        public bool GuessedCorrectly { get; set; }
     }
 }
