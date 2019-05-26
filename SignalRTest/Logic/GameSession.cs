@@ -35,5 +35,9 @@ namespace SignalRTest.Logic
             d.Shown = true;
             return d.DrawUri;
         }
+        public bool AllDrawsShown()
+        {
+            return players.Any(p => p.Draws.Any(d => d.Shown == false));
+        }
     }
 }

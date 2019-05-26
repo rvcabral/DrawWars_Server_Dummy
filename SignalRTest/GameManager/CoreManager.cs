@@ -54,7 +54,11 @@ namespace SignalRTest.GameManager
 
         internal static string GetUiClient(Context context)
         {
-            return Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault()?.UiClientConnection;
+            return GetUiClient(context.Session);
+        }
+        internal static string GetUiClient(Guid session)
+        {
+            return Sessions.Where(s => s.SessionId == session).FirstOrDefault()?.UiClientConnection;
         }
 
         internal static bool AllReady(Context context)
@@ -67,6 +71,7 @@ namespace SignalRTest.GameManager
         {
             return Sessions.Where(s => s.SessionId == session).FirstOrDefault();
         }
+        
 
         internal static void SetRounDone(Context context)
         {
@@ -142,6 +147,16 @@ namespace SignalRTest.GameManager
             });
 
             return connections;
+        }
+
+        internal static List<string> GetContextPlayerConnectionId(Context context)
+        {
+            return GetContextPlayerConnectionId(context.Session);
+        }
+
+        internal static List<string> GetContextPlayerConnectionId(Guid Session)
+        {
+            return GetSession(Session)?.players.Select(s => s.ConnectionId).ToList();
         }
 
         private static string GenerateRoomCode()
