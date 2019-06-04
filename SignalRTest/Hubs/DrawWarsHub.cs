@@ -42,7 +42,7 @@ namespace SignalRTest.Hubs
             Console.WriteLine($"Player {context.PlayerId} from Session {context.Session} has set his nickname to {nickname}");
             var success = CoreManager.SetUserNickName(context, nickname);
             await Clients.Caller.SendAsync("AckNickname");
-            string uiConId = CoreManager.GetUiClient(context);
+            string uiConId = CoreManager.GetUiClient(context.Session);
             await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
         }
 
@@ -63,7 +63,7 @@ namespace SignalRTest.Hubs
             var s = CoreManager.GetSession(session);
             var uiC = s.UiClientConnection;
             
-            await Clients.Clients(CoreManager.GetSession(session).players.Select(p=>p.ConnectionId).ToList()).SendAsync("TimesUp");
+            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("TimesUp");
         }
 
         public async Task DrawSubmitted(Context context)
@@ -99,7 +99,7 @@ namespace SignalRTest.Hubs
         public async Task NextGamePhase(Guid session)
         {
 
-            await Clients.Clients(CoreManager.GetSession(session).players.Select(p=>p.ConnectionId).ToList()).SendAsync("SeeResults");
+            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults");
             await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("SeeResults", 15);
         }
 
@@ -123,7 +123,7 @@ namespace SignalRTest.Hubs
                 {
                     guess,
                     isCorrect = true,
-                    player = CoreManager.GetSession(context.Session).players.FirstOrDefault(p => p.PlayerId == context.PlayerId).nickname
+                    player = CoreManager.GetSession(context.Session).GetPlayerSafe(context.PlayerId).nickname
                 });
 
                 await Clients.Caller.SendAsync("RightGuess");
@@ -136,7 +136,7 @@ namespace SignalRTest.Hubs
                 {
                     guess,
                     isCorrect = false,
-                    player = CoreManager.GetSession(context.Session).players.FirstOrDefault(p => p.PlayerId == context.PlayerId).nickname
+                    player = CoreManager.GetSession(context.Session).GetPlayerSafe(context.PlayerId).nickname
                 });
                 await Clients.Caller.SendAsync("WrongGuess");
             }

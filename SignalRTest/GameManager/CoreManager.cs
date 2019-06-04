@@ -9,142 +9,170 @@ namespace SignalRTest.GameManager
     public static class CoreManager
     {
         public static List<GameSession> Sessions = new List<GameSession>();
+        private static object SessionsLock = new object();
         private static Random random = new Random();
+
+        #region Concurrent Safe Util Functions
+
+        private static GameSession GetSessionByIdSafe(Guid session)
+        {
+            GameSession gs = null; 
+            lock (SessionsLock)
+            {
+                gs = Sessions.FirstOrDefault(s => s.SessionId == session);
+            }
+            return gs;
+        }
+
+        private static GameSession GetSessionByRoomSafe(string room)
+        {
+            room = room.ToUpper();
+            GameSession gs = null;
+            lock (SessionsLock)
+            {
+                gs = Sessions.FirstOrDefault(s => s.Room == room);
+            }
+            return gs;
+        }
+
+        private static bool AddSessionSafe(GameSession session)
+        {
+            var ok = true;
+            lock (SessionsLock)
+            {
+                if (!Sessions.Any(s => s.SessionId == session.SessionId || s.Room == session.Room))
+                    Sessions.Add(session);
+
+                else ok = false;
+            }
+            return ok;
+
+        }
+
+        private static string GetUiClientSafe(Guid session)
+        {
+            lock (SessionsLock)
+            {
+                return Sessions.FirstOrDefault(s => s.SessionId == session)?.UiClientConnection;
+            }
+        }
+
+        #endregion
 
         public static Context inlist(string room, string connectionId)
         {
-            GameSession session;
-            var player = new Player
+            
+            GameSession session = GetSessionByRoomSafe(room);
+            if (session != null)
             {
-                PlayerId = Guid.NewGuid(),
-                Points = 0,
-                ConnectionId = connectionId,
-                Draws = new List<Draw>()
-            };
-            if (Sessions.Any(s => s.Room == room))
-            {
-                session = Sessions.Where(s => s.Room == room).FirstOrDefault();
-                session.players.Add(player);
+                var player = session.AddPlayerSafe(connectionId);
                 return new Context(session.SessionId, player.PlayerId);
             }
             else //DEBUG PURPOSE ONLY
             {
-                session = new GameSession
-                {
-                    Room = room,
-                    SessionId = Guid.NewGuid(),
-                    players = new List<Player>()
-                };
-                session.players.Add(player);
-                Sessions.Add(session);
+                session = new GameSession(room.ToUpper());
+                AddSessionSafe(session);
+                var player = session.AddPlayerSafe(connectionId);
                 return new Context(session.SessionId, player.PlayerId);
             }
-            //return new Context(Guid.Empty, player.PlayerId);
         }
 
         internal static void setDraw(Context context, string uri, string Theme)
         {
-            Sessions.FirstOrDefault(s => s.SessionId == context.Session).setArt(context.PlayerId,uri, Theme);
+            var session = GetSessionByIdSafe(context.Session);
+            if(session!=null)
+                session.setArt(context.PlayerId,uri, Theme);
         }
 
         internal static bool ValidContext(Context context)
         {
-            return Sessions.Any(s => s.SessionId == context.Session && s.players.Any(p => p.PlayerId == context.PlayerId));
+            var session = GetSessionByIdSafe(context.Session);
+            if (session == null) return false;
+            var player = session.GetPlayerSafe(context.PlayerId);
+            if (player == null) return false;
+            return true;
         }
 
-        internal static string GetUiClient(Context context)
-        {
-            return GetUiClient(context.Session);
-        }
         internal static string GetUiClient(Guid session)
         {
-            return Sessions.Where(s => s.SessionId == session).FirstOrDefault()?.UiClientConnection;
+            return GetUiClientSafe(session);
         }
+        
 
         internal static bool AllReady(Context context)
         {
-            var session = Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault();
-            return session.players.Count() == session.players.Where(p => p.RoundDone).Count();
+            var session = GetSession(context.Session);
+            if (session == null) throw new Exception($"No such session find. {context.Session}");
+            return session.AllPlayersReady();
         }
 
         internal static GameSession GetSession(Guid session)
         {
-            return Sessions.Where(s => s.SessionId == session).FirstOrDefault();
+            return GetSessionByIdSafe(session);
         }
         
 
         internal static void SetRounDone(Context context)
         {
-            Sessions.Where(s => s.SessionId == context.Session)
-                .FirstOrDefault()
-                .players
-                .Where(p => p.PlayerId == context.PlayerId)
-                .FirstOrDefault()
-                .RoundDone = true;
+            var session = GetSessionByIdSafe(context.Session);
+            if (session == null) return;
+            var player = session.GetPlayerSafe(context.PlayerId);
+            if (player == null) return;
+            player.RoundDone = true;
         }
 
         internal static bool AllDrawsSubmitted(Context context)
         {
             var session = GetSession(context.Session);
-            return !session.players.Any(p => p.Draws.Count == 0);
+            if (session == null) throw new Exception($"No such session find. {context.Session}");
+            return session.AllDrawsSubmitted();
         }
 
         internal static void ResetRounDone(Guid session)
         {
-            Sessions.Where(s => s.SessionId == session)
-                .FirstOrDefault()
-                .players
-                .ForEach(p => p.RoundDone = false);
+            var s = GetSessionByIdSafe(session);
+            if (s == null) throw new Exception($"No such session find. {session}");
+            s.ResetPlayerGuesses();
         }
         internal static void SetAllRounDone(Guid session)
         {
-            Sessions.Where(s => s.SessionId == session)
-                .FirstOrDefault()
-                .players
-                .ForEach(p => p.RoundDone = true);
-            
+            var s = GetSessionByIdSafe(session);
+            if (s == null) throw new Exception($"No such session find. {session}");
+            s.SetAllRounDone();
         }
 
         internal static bool SetUserNickName(Context context, string nickname)
         {
-            var sess = Sessions.Where(s => s.SessionId == context.Session).FirstOrDefault();
+            var sess = GetSessionByIdSafe(context.Session);
             if (sess == null) return false;
-            var plr = sess.players.Where(p => p.PlayerId == context.PlayerId).FirstOrDefault();
+            var plr = sess.GetPlayerSafe(context.PlayerId);
             if (plr == null) return false;
             plr.nickname = nickname;
             return true;
-
         }
 
         
 
         internal static GameSession RegisterUIClient(string connection)
         {
-            var session = new GameSession
-            {
-                SessionId = Guid.NewGuid(),
-                Room = GenerateRoomCode(),
-                UiClientConnection = connection,
-                players = new List<Player>()
-            };
-            Sessions.Add(session);
+            var session = new GameSession(GenerateRoomCode());
+            AddSessionSafe(session);
             return session;
         }
 
         internal static bool AllGuessedCorrectly(Context context)
         {
-            return !GetSession(context.Session).players.Any(p => p.GuessedCorrectly == false);
+            var sess = GetSessionByIdSafe(context.Session);
+            if (sess == null) return false;
+            return sess.AllGuessedCorrectly();
         }
 
         internal static List<string> GetContextConnectionIds(Context context)
         {
-            var session = GetSession(context.Session);
+            var session = GetSessionByIdSafe(context.Session);
             List<string> connections = new List<string>();
-
-            connections.Add(session.UiClientConnection);
-            session.players.ForEach(p => {
-                connections.Add(p.ConnectionId);
-            });
+            connections.Add(GetUiClientSafe(context.Session));
+            connections.AddRange(session.GetAllPlayersConnections());
 
             return connections;
         }
@@ -156,7 +184,9 @@ namespace SignalRTest.GameManager
 
         internal static List<string> GetContextPlayerConnectionId(Guid Session)
         {
-            return GetSession(Session)?.players.Select(s => s.ConnectionId).ToList();
+            var session = GetSessionByIdSafe(Session);
+            if (session == null) throw new Exception($"No such session find. {Session}");
+            return session.GetAllPlayersConnections();
         }
 
         private static string GenerateRoomCode()
@@ -168,7 +198,7 @@ namespace SignalRTest.GameManager
                 newCode = new string(Enumerable.Repeat(chars, 6)
               .Select(s => s[random.Next(s.Length)]).ToArray());
             }
-            while (Sessions.Any(s => s.Room == newCode));
+            while (GetSessionByRoomSafe(newCode)!=null);
             return newCode;
         }
     }

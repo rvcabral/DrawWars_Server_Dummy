@@ -8,11 +8,24 @@ namespace SignalRTest.Logic
     public class GameSession
     {
         private const int MaxLotation = 6;
+        
         public string Room { get; set; }
         public Guid SessionId { get; set; }
-        public List<Player> players;
+        private List<Player> players;
+        private object SessionLock = new object();
         public string UiClientConnection  { get; set; }
         public string currentTheme { get; set; }
+
+        #region ctor
+
+        public GameSession(string room)
+        {
+            Room = room;
+            players = new List<Player>();
+            SessionId = Guid.NewGuid();
+        }
+
+        #endregion
 
         public Dictionary<Guid, List<string>> GetThemes()
         {
@@ -24,7 +37,10 @@ namespace SignalRTest.Logic
 
         internal void setArt(Guid playerId, string draw, string theme)
         {
-            players.Where(p => p.PlayerId == playerId).FirstOrDefault()?.Draws.Add(new Draw(draw,theme));
+            Player player = GetPlayerSafe(playerId);
+            if (player == null) return;
+
+            player.Draws.Add(new Draw(draw,theme));
         }
 
         public string nextDraw()
@@ -35,19 +51,111 @@ namespace SignalRTest.Logic
             d.Shown = true;
             return d.DrawUri;
         }
+
         public bool AllDrawsShown()
         {
-            return players.Any(p => p.Draws.Any(d => d.Shown == false));
+            lock(SessionLock)
+            {
+                return players.Any(p => p.Draws.Any(d => d.Shown == false));
+            }
         }
 
         internal void ResetPlayerGuesses()
         {
-            players.ForEach(p => p.GuessedCorrectly = false);
+            lock (SessionLock)
+            {
+                players.ForEach(p => p.GuessedCorrectly = false);
+            }
         }
 
         internal void PlayerGuessedCorrectly(Guid playerId)
         {
-            players.Find(p => p.PlayerId == playerId).GuessedCorrectly = true;
+            var player = GetPlayerSafe(playerId);
+            if(player!=null)
+                player.GuessedCorrectly = true;
+        }
+
+        internal Player GetPlayerSafe(Guid PlayerId)
+        {
+            lock (SessionLock)
+            {
+                return players.FirstOrDefault(p => p.PlayerId == PlayerId);
+            }
+        }
+
+        internal Player AddPlayerSafe(string ConnectionId)
+        {
+            var player = new Player
+            {
+                Points = 0,
+                ConnectionId = ConnectionId,
+                Draws = new List<Draw>()
+            };
+            var inserted = false;
+            do
+            {
+                player.PlayerId = Guid.NewGuid();
+                lock (SessionLock)
+                {
+                    if (!players.Any(p => p.PlayerId == player.PlayerId))
+                    {
+                        players.Add(player);
+                        inserted = true;
+                    }
+                }
+
+
+            } while (!inserted);
+            return player;
+        }
+
+        internal bool AllDrawsSubmitted()
+        {
+            lock (SessionLock)
+            {
+                return !players.Any(p => p.Draws.Count == 0);
+            }
+        }
+
+        internal void ResetRounDone()
+        {
+            lock (SessionLock)
+            {
+                players.ForEach(p => p.RoundDone = false);
+            }
+        }
+
+        internal bool AllPlayersReady()
+        {
+            lock(SessionLock)
+            {
+                return players.Count() == players.Where(p => p.RoundDone).Count();
+            }
+        }
+
+        internal void SetAllRounDone()
+        {
+            lock (SessionLock)
+            {
+                players.ForEach(p => p.RoundDone = true);
+            }
+        }
+
+        internal bool AllGuessedCorrectly()
+        {
+            lock(SessionLock)
+            {
+                return !players.Any(p => p.GuessedCorrectly == false);
+            }
+        }
+
+        internal List<string> GetAllPlayersConnections()
+        {
+            
+            lock(SessionLock)
+            {
+                return players.Select(p => p.ConnectionId).ToList();
+            }
         }
     }
 }
