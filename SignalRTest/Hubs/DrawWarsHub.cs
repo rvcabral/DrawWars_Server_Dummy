@@ -16,8 +16,11 @@ namespace SignalRTest.Hubs
 
         public async Task Inlist(string room)
         {
-            Console.WriteLine($"Registering unto room {room}");
-           
+            //Console.WriteLine($"Registering unto room {room}");
+            //if(CoreManager.IsPlayerAlreadyRegistered(room, Context.ConnectionId))
+            //{
+            //    return;
+            //}
             var res = CoreManager.inlist(room, Context.ConnectionId);
             if (res.Session.Equals(Guid.Empty))
             {

@@ -24,6 +24,13 @@ namespace SignalRTest.GameManager
             return gs;
         }
 
+        internal static bool IsPlayerAlreadyRegistered(string room, string connectionId)
+        {
+            var session = GetSessionByRoomSafe(room);
+            if (session == null) return true;
+            return session.GetPlayerByConnectionIdSafe(connectionId)!=null;
+        }
+
         private static GameSession GetSessionByRoomSafe(string room)
         {
             room = room.ToUpper();
@@ -68,13 +75,14 @@ namespace SignalRTest.GameManager
                 var player = session.AddPlayerSafe(connectionId);
                 return new Context(session.SessionId, player.PlayerId);
             }
-            else //DEBUG PURPOSE ONLY
-            {
-                session = new GameSession(room.ToUpper());
-                AddSessionSafe(session);
-                var player = session.AddPlayerSafe(connectionId);
-                return new Context(session.SessionId, player.PlayerId);
-            }
+            //else //DEBUG PURPOSE ONLY
+            //{
+            //    session = new GameSession(room.ToUpper());
+            //    AddSessionSafe(session);
+            //    var player = session.AddPlayerSafe(connectionId);
+            //    return new Context(session.SessionId, player.PlayerId);
+            //}
+            return new Context(Guid.Empty, Guid.Empty);
         }
 
         internal static void setDraw(Context context, string uri, string Theme)

@@ -35,6 +35,14 @@ namespace SignalRTest.Logic
             return themes;
         }
 
+        internal object GetPlayerByConnectionIdSafe(string connectionId)
+        {
+            lock (SessionLock)
+            {
+                return players.FirstOrDefault(p => p.ConnectionId == connectionId);
+            }
+        }
+
         internal void setArt(Guid playerId, string draw, string theme)
         {
             Player player = GetPlayerSafe(playerId);
