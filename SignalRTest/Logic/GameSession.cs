@@ -18,11 +18,12 @@ namespace SignalRTest.Logic
 
         #region ctor
 
-        public GameSession(string room)
+        public GameSession(string room, string uiConnectionId)
         {
             Room = room;
             players = new List<Player>();
             SessionId = Guid.NewGuid();
+            UiClientConnection = uiConnectionId;
         }
 
         #endregion

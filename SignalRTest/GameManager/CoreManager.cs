@@ -163,7 +163,7 @@ namespace SignalRTest.GameManager
 
         internal static GameSession RegisterUIClient(string connection)
         {
-            var session = new GameSession(GenerateRoomCode());
+            var session = new GameSession(GenerateRoomCode(), connection);
             AddSessionSafe(session);
             return session;
         }
