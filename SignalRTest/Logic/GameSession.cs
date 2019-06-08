@@ -65,7 +65,7 @@ namespace SignalRTest.Logic
         {
             lock(SessionLock)
             {
-                return players.Any(p => p.Draws.Any(d => d.Shown == false));
+                return !players.Any(p => p.Draws.Any(d => d.Shown == false));
             }
         }
 
