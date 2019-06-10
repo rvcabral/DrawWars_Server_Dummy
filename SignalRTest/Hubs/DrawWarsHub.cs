@@ -51,6 +51,7 @@ namespace SignalRTest.Hubs
 
         public async Task Ready(Context context)
         {
+            CoreManager.StartSession(context.Session);
             var playerConnections = CoreManager.GetContextPlayerConnectionId(context);
 
             await Clients.Clients(playerConnections).SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
@@ -83,7 +84,7 @@ namespace SignalRTest.Hubs
             var nextDraw = CoreManager.GetSession(session).nextDraw();
             if (nextDraw!=null && !string.IsNullOrWhiteSpace(nextDraw.DrawUri))
             {
-                CoreManager.GetSession(session).ResetPlayerGuesses();
+                CoreManager.GetSession(session).ResetRounDone();
                 var owner = CoreManager.GetSession(session).GetPlayerSafe(nextDraw.Owner);
                 
                 await Clients.Clients(CoreManager.GetContextPlayerConnectionIdExcept(session, nextDraw.Owner)).SendAsync("TryAndGuess");
@@ -103,9 +104,10 @@ namespace SignalRTest.Hubs
 
         public async Task NextGamePhase(Guid session)
         {
-
-            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults");
+            
+            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults", CoreManager.GetSession(session).GetPlayersScores());
             await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("SeeResults", 15);
+
         }
 
         public async Task ResultsShown(Guid session)

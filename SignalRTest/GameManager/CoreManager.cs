@@ -66,6 +66,13 @@ namespace SignalRTest.GameManager
             return session.GetPlayerByConnectionIdSafe(connectionId)!=null;
         }
 
+        internal static void StartSession(Guid session)
+        {
+            var s = GetSessionByIdSafe(session);
+            if (s == null) return;
+            s.StartSession();
+        }
+
         private static GameSession GetSessionByRoomSafe(string room)
         {
             room = room.ToUpper();
@@ -110,18 +117,12 @@ namespace SignalRTest.GameManager
         {
             
             GameSession session = GetSessionByRoomSafe(room);
-            if (session != null)
+            if (session != null && !session.HasStarted())
             {
                 var player = session.AddPlayerSafe(connectionId);
                 return new Context(session.SessionId, player.PlayerId);
             }
-            //else //DEBUG PURPOSE ONLY
-            //{
-            //    session = new GameSession(room.ToUpper());
-            //    AddSessionSafe(session);
-            //    var player = session.AddPlayerSafe(connectionId);
-            //    return new Context(session.SessionId, player.PlayerId);
-            //}
+
             return new Context(Guid.Empty, Guid.Empty);
         }
 
@@ -180,7 +181,7 @@ namespace SignalRTest.GameManager
         {
             var s = GetSessionByIdSafe(session);
             if (s == null) throw new Exception($"No such session find. {session}");
-            s.ResetPlayerGuesses();
+            s.ResetPlayerData();
         }
         internal static void SetAllRounDone(Guid session)
         {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SignalRTest.Logic
@@ -17,7 +18,9 @@ namespace SignalRTest.Logic
         public string UiClientConnection  { get; set; }
         public string currentTheme { get; set; }
         public DateTime StartMoment { get; set; }
-
+        private bool Started { get; set; }
+        private int CurrentScore;
+        private int MaxRoundScore = 0;
         #region ctor
 
         public GameSession(string room, string uiConnectionId)
@@ -31,6 +34,22 @@ namespace SignalRTest.Logic
 
         #endregion
 
+        public void StartSession()
+        {
+            lock (SessionLock)
+            {
+                Started = true;
+                MaxRoundScore = players.Count;
+            }
+        }
+        public bool HasStarted()
+        {
+            lock (SessionLock)
+            {
+                return Started;
+            }
+        }
+    
         public Dictionary<Guid, List<string>> GetThemes()
         {
             var themes = new Dictionary<Guid, List<string>>();
@@ -74,17 +93,21 @@ namespace SignalRTest.Logic
             }
         }
 
-        internal void ResetPlayerGuesses()
+        internal void ResetPlayerData()
         {
             lock (SessionLock)
             {
-                players.ForEach(p => p.GuessedCorrectly = false);
+                players.ForEach(p =>
+                {
+                    p.GuessedCorrectly = false;
+                });
             }
         }
 
         internal void PlayerGuessedCorrectly(Guid playerId)
         {
             var player = GetPlayerSafe(playerId);
+            player.Points += Interlocked.Decrement(ref MaxRoundScore); 
             if(player!=null)
                 player.GuessedCorrectly = true;
         }
@@ -123,6 +146,13 @@ namespace SignalRTest.Logic
             return player;
         }
 
+        internal List<PlayerResult> GetPlayersScores()
+        {
+            var list = new List<PlayerResult>();
+            players.ForEach(p => list.Add(new PlayerResult(p.nickname, p.Points)));
+            return list;
+        }
+
         internal bool AllDrawsSubmitted()
         {
             lock (SessionLock)
@@ -152,7 +182,9 @@ namespace SignalRTest.Logic
             lock (SessionLock)
             {
                 players.ForEach(p => p.RoundDone = true);
+                MaxRoundScore = players.Count;
             }
+            
         }
 
         internal bool AllGuessedCorrectly()
