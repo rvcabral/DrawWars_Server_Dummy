@@ -28,10 +28,10 @@ namespace SignalRTest.Controllers
                 }
                 catch (Exception e)
                 {
-                    return new { uri = string.Empty, errorMessage = "crap." };
+                    return new { uri = string.Empty, errorMessage = "Unable to upload draw" };
                 }
             }
-            return new { uri = string.Empty, errorMessage = "Invalid Context" };
+            return new {  uri = string.Empty, errorMessage = "Invalid Context" };
         }
 
         [HttpGet("time")]

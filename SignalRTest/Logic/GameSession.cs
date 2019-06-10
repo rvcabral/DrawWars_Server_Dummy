@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SignalRTest.GameManager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace SignalRTest.Logic
         private object SessionLock = new object();
         public string UiClientConnection  { get; set; }
         public string currentTheme { get; set; }
+        public DateTime StartMoment { get; set; }
 
         #region ctor
 
@@ -24,6 +26,7 @@ namespace SignalRTest.Logic
             players = new List<Player>();
             SessionId = Guid.NewGuid();
             UiClientConnection = uiConnectionId;
+            StartMoment = DateTime.Now;
         }
 
         #endregion
@@ -31,8 +34,10 @@ namespace SignalRTest.Logic
         public Dictionary<Guid, List<string>> GetThemes()
         {
             var themes = new Dictionary<Guid, List<string>>();
-            int counter = 1;
-            players.ForEach(p => themes.Add(p.PlayerId, new List<string> { $"Tema {counter++}" }));
+            var random = new Random();
+            players.ForEach(p => themes.Add(p.PlayerId, new List<string> { Themes.ThemesList.ElementAt(random.Next(Themes.ThemesList.Count)) }));
+
+            
             return themes;
         }
 
@@ -49,16 +54,16 @@ namespace SignalRTest.Logic
             Player player = GetPlayerSafe(playerId);
             if (player == null) return;
 
-            player.Draws.Add(new Draw(draw,theme));
+            player.Draws.Add(new Draw(draw,theme, playerId));
         }
 
-        public string nextDraw()
+        public Draw nextDraw()
         {
             var d = players.Where(p => p.Draws.FirstOrDefault().Shown == false).FirstOrDefault()?.Draws.FirstOrDefault();
-            if (d == null) return "";
+            if (d == null) return null;
             currentTheme = d.Theme;
             d.Shown = true;
-            return d.DrawUri;
+            return d;
         }
 
         public bool AllDrawsShown()
@@ -164,6 +169,13 @@ namespace SignalRTest.Logic
             lock(SessionLock)
             {
                 return players.Select(p => p.ConnectionId).ToList();
+            }
+        }
+        internal List<string> GetPlayersConnectionExcept(Guid pid)
+        {
+            lock (SessionLock)
+            {
+                return players.Where(p => p.PlayerId != pid).Select(p=>p.ConnectionId).ToList();
             }
         }
     }

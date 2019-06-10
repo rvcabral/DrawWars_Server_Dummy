@@ -13,4 +13,10 @@
     <ProjectReference Include="..\DrawWars.AWS\DrawWars.Aws.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\Themes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

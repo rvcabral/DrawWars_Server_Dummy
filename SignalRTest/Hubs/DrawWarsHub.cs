@@ -81,10 +81,13 @@ namespace SignalRTest.Hubs
         public async Task DrawPhaseLogic(Guid session)
         {
             var nextDraw = CoreManager.GetSession(session).nextDraw();
-            if (!string.IsNullOrWhiteSpace(nextDraw))
+            if (nextDraw!=null && !string.IsNullOrWhiteSpace(nextDraw.DrawUri))
             {
                 CoreManager.GetSession(session).ResetPlayerGuesses();
-                await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("TryAndGuess");
+                var owner = CoreManager.GetSession(session).GetPlayerSafe(nextDraw.Owner);
+                
+                await Clients.Clients(CoreManager.GetContextPlayerConnectionIdExcept(session, nextDraw.Owner)).SendAsync("TryAndGuess");
+                await Clients.Client(owner.ConnectionId).SendAsync("StandBy");
                 await Clients.Client(CoreManager.GetUiClient(session))
                 .SendAsync("ShowDrawing", new
                 {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SignalRTest.GameManager
@@ -11,8 +12,42 @@ namespace SignalRTest.GameManager
         public static List<GameSession> Sessions = new List<GameSession>();
         private static object SessionsLock = new object();
         private static Random random = new Random();
+        private static bool CleaningThreadRunnig = false;
+        private static object threadLock = new object();
+
+        private static Thread CleaningThread = new Thread(() =>
+        {
+            while (true)
+            {
+                Thread.Sleep(5 * 60 * 1000);
+                lock (SessionsLock)
+                {
+                    foreach(var sess in Sessions)
+                    {
+                        TimeSpan ts = DateTime.Now - sess.StartMoment;
+                        if (ts.TotalMinutes > 30)
+                            Sessions.Remove(sess);
+                    }
+                }
+            }
+
+        });
 
         #region Concurrent Safe Util Functions
+
+        private static void StartInitCleaingThread()
+        {
+            var switched = false;
+            lock (threadLock)
+            {
+                if (!CleaningThreadRunnig) {
+                    CleaningThreadRunnig = true;
+                    switched = true;
+                }
+            }
+            if (switched)
+                CleaningThread.Start();
+        }
 
         private static GameSession GetSessionByIdSafe(Guid session)
         {
@@ -51,6 +86,11 @@ namespace SignalRTest.GameManager
                     Sessions.Add(session);
 
                 else ok = false;
+            }
+            lock(threadLock)
+            {
+                if (!CleaningThreadRunnig)
+                    StartInitCleaingThread();
             }
             return ok;
 
@@ -195,6 +235,12 @@ namespace SignalRTest.GameManager
             var session = GetSessionByIdSafe(Session);
             if (session == null) throw new Exception($"No such session find. {Session}");
             return session.GetAllPlayersConnections();
+        }
+        internal static List<string> GetContextPlayerConnectionIdExcept(Guid Session, Guid excludePlayerId)
+        {
+            var session = GetSessionByIdSafe(Session);
+            if (session == null) throw new Exception($"No such session find. {Session}");
+            return session.GetPlayersConnectionExcept(excludePlayerId);
         }
 
         private static string GenerateRoomCode()
