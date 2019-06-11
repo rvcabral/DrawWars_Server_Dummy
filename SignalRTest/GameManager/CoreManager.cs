@@ -146,7 +146,11 @@ namespace SignalRTest.GameManager
         {
             return GetUiClientSafe(session);
         }
-        
+
+        internal static bool IsEndOfSession(Guid session)
+        {
+            return GetSessionByIdSafe(session).IsEndOfSession();
+        }
 
         internal static bool AllReady(Context context)
         {

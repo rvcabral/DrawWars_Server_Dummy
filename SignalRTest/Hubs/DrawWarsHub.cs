@@ -105,8 +105,8 @@ namespace SignalRTest.Hubs
         public async Task NextGamePhase(Guid session)
         {
             
-            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults", CoreManager.GetSession(session).GetPlayersScores());
-            await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("SeeResults", 15);
+            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults");
+            await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("SeeResults", CoreManager.GetSession(session).GetPlayersScores());
 
         }
 
@@ -114,9 +114,27 @@ namespace SignalRTest.Hubs
         {
             if (!CoreManager.GetSession(session).AllDrawsShown())
                 await DrawPhaseLogic(session);
-            
+
             else
-                await Clients.All.SendAsync("EndOfGame");
+            {
+                if(!CoreManager.IsEndOfSession(session)){
+                    CoreManager.ResetRounDone(session);
+                    await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("NextRound");
+                    await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("NextRound", 5);
+                }
+                else
+                {
+                    await Clients.All.SendAsync("EndOfGame");
+                }
+            }
+        }
+
+
+        public async Task RoundEndedAck(Guid session)
+        {
+            CoreManager.ResetRounDone(session);
+            await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("DrawThemes", CoreManager.GetSession(session).GetThemes());
+            await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("DrawThemes", 60);
         }
 
         public async Task SendGuess(Context context, string guess)

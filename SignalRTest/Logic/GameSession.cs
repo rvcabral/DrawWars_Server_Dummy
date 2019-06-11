@@ -21,6 +21,7 @@ namespace SignalRTest.Logic
         private bool Started { get; set; }
         private int CurrentScore;
         private int MaxRoundScore = 0;
+        private int Rounds { get; set; }
         #region ctor
 
         public GameSession(string room, string uiConnectionId)
@@ -30,6 +31,7 @@ namespace SignalRTest.Logic
             SessionId = Guid.NewGuid();
             UiClientConnection = uiConnectionId;
             StartMoment = DateTime.Now;
+            Rounds = 3;
         }
 
         #endregion
@@ -161,6 +163,12 @@ namespace SignalRTest.Logic
             }
         }
 
+        internal bool IsEndOfSession()
+        {
+            Rounds = Rounds - 1;
+            return Rounds == 0;
+        }
+
         internal void ResetRounDone()
         {
             lock (SessionLock)
@@ -191,7 +199,7 @@ namespace SignalRTest.Logic
         {
             lock(SessionLock)
             {
-                return !players.Any(p => p.GuessedCorrectly == false);
+                return players.Count(p => p.GuessedCorrectly == false)==1;
             }
         }
 
