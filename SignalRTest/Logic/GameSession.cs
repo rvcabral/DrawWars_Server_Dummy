@@ -176,6 +176,7 @@ namespace SignalRTest.Logic
                     p.RoundDone = false;
                     p.GuessedCorrectly = false;
                 });
+                MaxRoundScore = players.Count;
             }
         }
 
