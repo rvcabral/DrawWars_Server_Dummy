@@ -19,7 +19,6 @@ namespace SignalRTest.Logic
         public string currentTheme { get; set; }
         public DateTime StartMoment { get; set; }
         private bool Started { get; set; }
-        private int CurrentScore;
         private int MaxRoundScore = 0;
         private int Rounds { get; set; }
         #region ctor
@@ -173,7 +172,10 @@ namespace SignalRTest.Logic
         {
             lock (SessionLock)
             {
-                players.ForEach(p => p.RoundDone = false);
+                players.ForEach(p => {
+                    p.RoundDone = false;
+                    p.GuessedCorrectly = false;
+                });
             }
         }
 
