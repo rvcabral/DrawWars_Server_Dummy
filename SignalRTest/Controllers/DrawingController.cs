@@ -26,7 +26,7 @@ namespace SignalRTest.Controllers
                     CoreManager.setDraw(context, uri, model.Theme);
                     return new { uri, errorMessage = string.Empty };
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return new { uri = string.Empty, errorMessage = "Unable to upload draw" };
                 }

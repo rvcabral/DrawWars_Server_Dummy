@@ -152,6 +152,11 @@ namespace SignalRTest.GameManager
             return GetSessionByIdSafe(session).IsEndOfSession();
         }
 
+        internal static void CleanDraws(Guid session)
+        {
+            GetSessionByIdSafe(session).CleanDraws();
+        }
+
         internal static bool AllReady(Context context)
         {
             var session = GetSession(context.Session);

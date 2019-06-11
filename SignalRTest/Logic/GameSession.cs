@@ -74,12 +74,12 @@ namespace SignalRTest.Logic
             Player player = GetPlayerSafe(playerId);
             if (player == null) return;
 
-            player.Draws.Add(new Draw(draw,theme, playerId));
+            player.Draw = new Draw(draw,theme, playerId);
         }
 
         public Draw nextDraw()
         {
-            var d = players.Where(p => p.Draws.FirstOrDefault().Shown == false).FirstOrDefault()?.Draws.FirstOrDefault();
+            var d = players.Where(p => p.Draw.Shown == false).FirstOrDefault()?.Draw;
             if (d == null) return null;
             currentTheme = d.Theme;
             d.Shown = true;
@@ -90,10 +90,19 @@ namespace SignalRTest.Logic
         {
             lock(SessionLock)
             {
-                return !players.Any(p => p.Draws.Any(d => d.Shown == false));
+                return !players.Any(p => p.Draw.Shown == false);
             }
         }
-
+        internal void CleanDraws()
+        {
+            lock (SessionLock)
+            {
+                players.ForEach(p =>
+                {
+                    p.Draw = null;
+                });
+            }
+        }
         internal void ResetPlayerData()
         {
             lock (SessionLock)
@@ -127,7 +136,7 @@ namespace SignalRTest.Logic
             {
                 Points = 0,
                 ConnectionId = ConnectionId,
-                Draws = new List<Draw>()
+                Draw = null
             };
             var inserted = false;
             do
@@ -158,7 +167,7 @@ namespace SignalRTest.Logic
         {
             lock (SessionLock)
             {
-                return !players.Any(p => p.Draws.Count == 0);
+                return !players.Any(p => p.Draw == null);
             }
         }
 

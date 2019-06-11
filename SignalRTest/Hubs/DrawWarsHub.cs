@@ -119,6 +119,7 @@ namespace SignalRTest.Hubs
             {
                 if(!CoreManager.IsEndOfSession(session)){
                     CoreManager.ResetRounDone(session);
+                    CoreManager.CleanDraws(session);
                     await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("NextRound");
                     await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("NextRound", 5);
                 }
@@ -170,37 +171,6 @@ namespace SignalRTest.Hubs
         
         #endregion
 
-
-        #region not yet implemented
-        //Utilizar o ShowScores no contexto de outro método para notificar o front-end
-        //Adicionar um boolean na resposta para avisar quando o jogo tiver terminado
-        //e colocar no android um botão de NewGame
-        /*
-            SendAsync("ShowScores", scores) scores -> {player1: 1, player2: 20, player3: 14...}
-            */
-
-        //Recomendo não haver nova ronda, para o beta. No entanto se for para suportar,
-        //no fim do ScoreBoard ter sido mostrado, por exemplo após 10 segundos, contados pelo servidor,
-        //será necessário chamar o NewRound de forma a colocar o FE e o Android nos devidos ecrãs,
-        //sendo o ecrã do android o que mostra o tema e a tela e o do FE o que tem o contador à espera que
-        //sejam terminados os desenhos.
-        public async Task NewRound()
-        {
-            /*
-              SendAsync("NewRound")
-             */
-        }
-
-
-        public async Task NewGame()
-        {
-            //TODO: Metodo chamado pelo android quando 1 jogo termina e o user quer jogar novamente.
-            //Notificar o FE do sucedido de forma a ser enviado para a de start drawing
-            /*
-              SendAsync("NewGame", roomCode)
-             */
-        }
-        #endregion
 
     }
 }
