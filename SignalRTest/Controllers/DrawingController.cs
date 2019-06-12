@@ -18,7 +18,7 @@ namespace SignalRTest.Controllers
             var context = new Context(model.SessionID, model.PlayerID);
             if (CoreManager.ValidContext(context))
             {
-                var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}.{model.Extension}";
+                var filename = $"{model.SessionID.ToString("N")}{model.PlayerID.ToString("N")}{Guid.NewGuid()}.{model.Extension}";
                 var picture = Convert.FromBase64String(model.Drawing);
                 try
                 {
@@ -36,5 +36,9 @@ namespace SignalRTest.Controllers
 
         [HttpGet("time")]
         public DateTimeOffset GetTime() => DateTimeOffset.UtcNow;
+
+
+        [HttpGet("HowManySessionsAtPlay")]
+        public int GetSessionsCount() => CoreManager.GetSessionCount();
     }
 }

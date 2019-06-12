@@ -49,6 +49,11 @@ namespace SignalRTest.GameManager
                 CleaningThread.Start();
         }
 
+        internal static int GetSessionCount()
+        {
+            return Sessions.Count;
+        }
+
         private static GameSession GetSessionByIdSafe(Guid session)
         {
             GameSession gs = null; 
