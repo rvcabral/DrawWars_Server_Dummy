@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawWars.Api", "DrawWars.Api\DrawWars.Api.csproj", "{951EAD4C-EB56-4D44-9003-3874D93A8854}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawWars.Aws", "DrawWars.AWS\DrawWars.Aws.csproj", "{E9AD0080-EB17-4633-9597-1921FC36A4D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DrawWars.Database", "DrawWars.Database\DrawWars.Database.sqlproj", "{6BD311E4-1336-4135-88F1-19AA7AE276EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawWars.Data", "DrawWars.Data\DrawWars.Data.csproj", "{1B52DEB2-633F-4217-8CDB-45205E7FEE74}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{E9371602-B7D8-4CDD-8EC8-4DCEEA8AF15B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{951EAD4C-EB56-4D44-9003-3874D93A8854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{951EAD4C-EB56-4D44-9003-3874D93A8854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{951EAD4C-EB56-4D44-9003-3874D93A8854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{951EAD4C-EB56-4D44-9003-3874D93A8854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9AD0080-EB17-4633-9597-1921FC36A4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9AD0080-EB17-4633-9597-1921FC36A4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9AD0080-EB17-4633-9597-1921FC36A4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9AD0080-EB17-4633-9597-1921FC36A4D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E9AD0080-EB17-4633-9597-1921FC36A4D4} = {E9371602-B7D8-4CDD-8EC8-4DCEEA8AF15B}
+		{6BD311E4-1336-4135-88F1-19AA7AE276EB} = {F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}
+		{1B52DEB2-633F-4217-8CDB-45205E7FEE74} = {F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CCE1DB7-4DE4-4C73-96C1-AFB59F2BD39D}
+	EndGlobalSection
+EndGlobal
