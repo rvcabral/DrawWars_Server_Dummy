@@ -22,11 +22,11 @@ namespace SignalRTest.GameManager
                 Thread.Sleep(5 * 60 * 1000);
                 lock (SessionsLock)
                 {
-                    foreach(var sess in Sessions)
+                    for(int  i =0;i<Sessions.Count; ++i)
                     {
-                        TimeSpan ts = DateTime.Now - sess.StartMoment;
+                        TimeSpan ts = DateTime.Now - Sessions.ElementAt(i).StartMoment;
                         if (ts.TotalMinutes > 30)
-                            Sessions.Remove(sess);
+                            Sessions.RemoveAt(i);
                     }
                 }
             }
