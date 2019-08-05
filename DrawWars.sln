@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawWars.Data", "DrawWars.D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{E9371602-B7D8-4CDD-8EC8-4DCEEA8AF15B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawWars.Entities", "DrawWars.Entities\DrawWars.Entities.csproj", "{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B52DEB2-633F-4217-8CDB-45205E7FEE74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +53,7 @@ Global
 		{E9AD0080-EB17-4633-9597-1921FC36A4D4} = {E9371602-B7D8-4CDD-8EC8-4DCEEA8AF15B}
 		{6BD311E4-1336-4135-88F1-19AA7AE276EB} = {F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}
 		{1B52DEB2-633F-4217-8CDB-45205E7FEE74} = {F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}
+		{0D6A15B0-375C-4DD3-B7AF-BBB0BD45F974} = {F2E48D4D-7E79-4A9C-A3C8-F283B789E48A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CCE1DB7-4DE4-4C73-96C1-AFB59F2BD39D}

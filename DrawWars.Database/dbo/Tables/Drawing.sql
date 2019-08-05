@@ -1,19 +1,22 @@
 ﻿CREATE TABLE [dbo].[Drawing] (
-    [ID]          INT                IDENTITY (1, 1) NOT NULL,
-    [Url]         NVARCHAR (2048)    NOT NULL,
-    [DeviceID]    UNIQUEIDENTIFIER   NOT NULL,
-    [SessionID]   UNIQUEIDENTIFIER   NOT NULL,
-    [DateCreated] DATETIMEOFFSET (7) DEFAULT (sysdatetimeoffset()) NULL,
-    CONSTRAINT [PK__Drawing] PRIMARY KEY CLUSTERED ([ID] ASC)
+    [Id]         INT             IDENTITY (1, 1) NOT NULL,
+    [GameRoomId] INT             NULL,
+    [PlayerId]   INT             NULL,
+    [ThemeId]    INT             NULL,
+    [Url]        NVARCHAR (2048) NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    FOREIGN KEY ([GameRoomId]) REFERENCES [dbo].[GameRoom] ([Id]),
+    FOREIGN KEY ([PlayerId]) REFERENCES [dbo].[Player] ([Id]),
+    FOREIGN KEY ([ThemeId]) REFERENCES [dbo].[Theme] ([Id])
 );
 
 
-GO
-CREATE NONCLUSTERED INDEX [IX_Drawing_SessionID]
-    ON [dbo].[Drawing]([SessionID] ASC);
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_Drawing_DeviceID]
-    ON [dbo].[Drawing]([DeviceID] ASC);
+
+
+
+GO
+
 

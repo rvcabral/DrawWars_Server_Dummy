@@ -1,6 +1,7 @@
 using DrawWars.Api.Hubs;
 using DrawWars.Aws.Extensions;
-using DrawWars.Data.Drawing;
+using DrawWars.Data;
+using DrawWars.Data.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

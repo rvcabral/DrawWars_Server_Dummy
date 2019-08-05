@@ -2,7 +2,8 @@
 using DrawWars.Api.Logic;
 using DrawWars.Api.Models;
 using DrawWars.Aws;
-using DrawWars.Data.Drawing;
+using DrawWars.Data.Contracts;
+using DrawWars.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,6 @@ namespace DrawWars.Api.Controllers
                     var uri = new AwsManager().S3_UploadFile(filename, picture);
 
                     CoreManager.setDraw(context, uri, model.Theme);
-                    _drawingRepository.Insert(uri, model.PlayerID, model.SessionID);
 
                     return new { uri, errorMessage = string.Empty };
                 }
@@ -43,20 +43,5 @@ namespace DrawWars.Api.Controllers
             }
             return new {  uri = string.Empty, errorMessage = "Invalid Context" };
         }
-        
-        [HttpGet]
-        public IEnumerable<Drawing> GetRandom() =>
-            _drawingRepository.GetRandom();
-
-        [HttpGet("session/{sessionID}")]
-        public IEnumerable<Drawing> GetSessionDrawings([FromRoute]Guid sessionID, int page = 0, int pageSize = 10) =>
-            _drawingRepository.GetBySessionID(sessionID, page, pageSize);
-
-        [HttpGet("device/{deviceID}")]
-        public IEnumerable<Drawing> GetDeviceDrawings([FromRoute]Guid deviceID, int page = 0, int pageSize = 10) =>
-            _drawingRepository.GetByDeviceID(deviceID, page, pageSize);
-
-        [HttpGet("HowManySessionsAtPlay")]
-        public int GetSessionsCount() => CoreManager.GetSessionCount();
     }
 }

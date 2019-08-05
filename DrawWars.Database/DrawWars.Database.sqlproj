@@ -63,9 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Drawing.sql" />
-    <Build Include="dbo\Stored Procedures\DrawingInsert.sql" />
-    <Build Include="dbo\Stored Procedures\DrawingGetRandom.sql" />
-    <Build Include="dbo\Stored Procedures\DrawingGetBySessionID.sql" />
-    <Build Include="dbo\Stored Procedures\DrawingGetByDeviceID.sql" />
+    <Build Include="dbo\Tables\Theme.sql" />
+    <Build Include="dbo\Tables\PlayerScore.sql" />
+    <Build Include="dbo\Tables\Player.sql" />
+    <Build Include="dbo\Tables\GameRoom.sql" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DrawWars.AWS\DrawWars.Aws.csproj" />
     <ProjectReference Include="..\DrawWars.Data\DrawWars.Data.csproj" />
+    <ProjectReference Include="..\DrawWars.Entities\DrawWars.Entities.csproj" />
   </ItemGroup>
 
   <ItemGroup>
