@@ -141,8 +141,8 @@ namespace SignalRTest.Hubs
         public async Task SendGuess(Context context, string guess)
         {
 
-            var currGuess = CoreManager.GetSession(context.Session).currentTheme;
-            if (guess.ToLower().Trim() == currGuess.ToLower().Trim())
+            var currTheme = CoreManager.GetSession(context.Session).currentTheme;
+            if(Themes.IsCorrect(currTheme, guess))
             {
                 CoreManager.GetSession(context.Session).PlayerGuessedCorrectly(context.PlayerId);
                 await Clients.Client(CoreManager.GetSession(context.Session).UiClientConnection).SendAsync("PlayerGuess", new
