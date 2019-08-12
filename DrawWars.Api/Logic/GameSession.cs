@@ -129,12 +129,13 @@ namespace DrawWars.Api.Logic
             }
         }
 
-        internal Player AddPlayerSafe(string ConnectionId)
+        internal Player AddPlayerSafe(string ConnectionId, string deviceId)
         {
             var player = new Player
             {
                 Points = 0,
                 ConnectionId = ConnectionId,
+                DeviceId = deviceId,
                 Draw = null
             };
             var inserted = false;

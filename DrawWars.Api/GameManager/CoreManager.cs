@@ -117,13 +117,13 @@ namespace DrawWars.Api.GameManager
 
         #endregion
 
-        public static Context inlist(string room, string connectionId)
+        public static Context inlist(string room, string connectionId, string deviceId)
         {
             
             GameSession session = GetSessionByRoomSafe(room);
             if (session != null && !session.HasStarted())
             {
-                var player = session.AddPlayerSafe(connectionId);
+                var player = session.AddPlayerSafe(connectionId, deviceId);
                 return new Context(session.SessionId, player.PlayerId);
             }
 

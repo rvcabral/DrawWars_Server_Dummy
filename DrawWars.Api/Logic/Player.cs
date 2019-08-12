@@ -7,6 +7,7 @@ namespace DrawWars.Api.Logic
     {
         public Guid PlayerId { get; set; }
         public string ConnectionId { get; set; }
+        public string DeviceId { get; set; }
         public int Points { get; set; }
         public string nickname { get; set; }
         public Draw Draw { get; set; }
