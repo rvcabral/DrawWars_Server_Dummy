@@ -11,14 +11,9 @@ namespace DrawWars.Api.Hubs
         
         #region Pre game phase
 
-        public async Task Inlist(string room)
+        public async Task Inlist(string room, string deviceId)
         {
-            //Console.WriteLine($"Registering unto room {room}");
-            //if(CoreManager.IsPlayerAlreadyRegistered(room, Context.ConnectionId))
-            //{
-            //    return;
-            //}
-            var res = CoreManager.inlist(room, Context.ConnectionId);
+            var res = CoreManager.inlist(room, Context.ConnectionId, deviceId);
             if (res.Session.Equals(Guid.Empty))
             {
                 await Clients.Caller.SendAsync("NonExistingSession", res.PlayerId);

@@ -75,6 +75,10 @@ namespace DrawWars.Api
         private void ConfigureDataServices(IServiceCollection services)
         {
             services.AddTransient<IDrawingRepository, DrawingRepository>();
+            services.AddTransient<IGameRoomRepository, GameRoomRepository>();
+            services.AddTransient<IPlayerRepository, PlayerRepository>();
+            services.AddTransient<IPlayerScoreRepository, PlayerScoreRepository>();
+            services.AddTransient<IThemeRepository, ThemeRepository>();
         }
 
         #endregion

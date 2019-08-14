@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
+using Dapper;
 using DrawWars.Data.Contracts;
 using DrawWars.Entities;
 using Microsoft.Extensions.Configuration;
@@ -10,9 +12,17 @@ namespace DrawWars.Data
     {
         public ThemeRepository(IConfiguration config) : base(config) { }
         
-        public Task<IEnumerable<Theme>> ListRandomAsync(int count)
-        {//TODO Implement
-            throw new System.NotImplementedException();
+        public async Task<IEnumerable<Theme>> ListRandomAsync(int count)
+        {
+            return await ExecuteOnConnection(async connection =>
+            {
+                return await connection.QueryAsync<Theme>(
+                    sql: $@"SELECT TOP {count} * 
+                            FROM Theme
+                            ORDER BY NEWID()",
+                    commandType: CommandType.Text
+                );
+            });
         }
     }
 }
