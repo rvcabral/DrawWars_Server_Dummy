@@ -115,7 +115,7 @@ namespace DrawWars.Api.GameManager
 
             if (session != null && !session.HasStarted())
             {
-                var player = session.AddPlayerSafe(connectionId);
+                var player = session.AddPlayerSafe(connectionId, deviceId);
                 return new Context(session.SessionId, player.PlayerId);
             }
 
