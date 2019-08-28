@@ -85,6 +85,11 @@ namespace DrawWars.Api.Logic
             return d;
         }
 
+        internal IEnumerable<Player> GetAllPlayers()
+        {
+            return players;
+        }
+
         public bool AllDrawsShown()
         {
             lock(SessionLock)
