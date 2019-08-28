@@ -1,3 +1,4 @@
+using DrawWars.Api.GameManager;
 using DrawWars.Api.Hubs;
 using DrawWars.Aws.Extensions;
 using DrawWars.Data;
@@ -16,6 +17,8 @@ namespace DrawWars.Api
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            CoreManager.Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }

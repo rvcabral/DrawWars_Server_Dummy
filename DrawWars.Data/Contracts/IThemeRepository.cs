@@ -6,8 +6,8 @@ namespace DrawWars.Data.Contracts
 {
     public interface IThemeRepository
     {
-        Task<Theme> GetAsync(int id);
+        Theme Get(int id);
 
-        Task<IEnumerable<Theme>> ListRandomAsync(int count);
+        IEnumerable<Theme> ListRandom(int count);
     }
 }

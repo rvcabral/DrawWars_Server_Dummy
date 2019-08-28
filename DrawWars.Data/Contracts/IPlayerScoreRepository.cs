@@ -6,8 +6,8 @@ namespace DrawWars.Data.Contracts
 {
     public interface IPlayerScoreRepository
     {
-        Task<IEnumerable<PlayerScore>> GetByGameRoomAsync(int gameRoomId);
+        IEnumerable<PlayerScore> GetByGameRoom(int gameRoomId);
 
-        Task<IEnumerable<PlayerScore>> GetByPlayerAsync(int playerId);
+        IEnumerable<PlayerScore> GetByPlayer(int playerId);
     }
 }

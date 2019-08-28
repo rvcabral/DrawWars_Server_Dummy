@@ -12,11 +12,11 @@ namespace DrawWars.Data
     {
         public GameRoomRepository(IConfiguration config) : base(config) { }
 
-        public async Task<IEnumerable<GameRoom>> ListByDeviceAsync(string deviceUuid)
+        public IEnumerable<GameRoom> ListByDevice(string deviceUuid)
         {
-            return await ExecuteOnConnection(async connection =>
+            return ExecuteOnConnection(connection =>
             {
-                return await connection.QueryAsync<GameRoom>(
+                return connection.Query<GameRoom>(
                     sql: $@"SELECT * 
                             FROM GameRoom
                                 INNER JOIN Player ON Player.GameRoomId = GameRoom.Id

@@ -12,11 +12,11 @@ namespace DrawWars.Data
     {
         public ThemeRepository(IConfiguration config) : base(config) { }
         
-        public async Task<IEnumerable<Theme>> ListRandomAsync(int count)
+        public IEnumerable<Theme> ListRandom(int count)
         {
-            return await ExecuteOnConnection(async connection =>
+            return ExecuteOnConnection(connection =>
             {
-                return await connection.QueryAsync<Theme>(
+                return connection.Query<Theme>(
                     sql: $@"SELECT TOP {count} * 
                             FROM Theme
                             ORDER BY NEWID()",

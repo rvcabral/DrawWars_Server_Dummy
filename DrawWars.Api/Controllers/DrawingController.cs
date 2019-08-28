@@ -34,11 +34,22 @@ namespace DrawWars.Api.Controllers
 
                     CoreManager.setDraw(context, uri, model.Theme);
 
+                    var session = CoreManager.GetSession(model.SessionID);
+                    var player = session.GetPlayerSafe(model.PlayerID);
+
+                    _drawingRepository.Create(new Drawing()
+                    {
+                        PlayerId = player.Id,
+                        ThemeId = player.CurrentThemeId,
+                        GameRoomId = session.RoomID,
+                        Url = uri
+                    });
+
                     return new { uri, errorMessage = string.Empty };
                 }
                 catch (Exception)
                 {
-                    return new { uri = string.Empty, errorMessage = "Unable to upload draw" };
+                    return new { uri = string.Empty, errorMessage = "Unable to upload drawing" };
                 }
             }
             return new {  uri = string.Empty, errorMessage = "Invalid Context" };

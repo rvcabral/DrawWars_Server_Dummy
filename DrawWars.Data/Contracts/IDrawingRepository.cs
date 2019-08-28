@@ -6,10 +6,10 @@ namespace DrawWars.Data.Contracts
 {
     public interface IDrawingRepository
     {
-        Task<Drawing> CreateAsync(Drawing drawing);
+        Drawing Create(Drawing drawing);
 
-        Task<IEnumerable<Drawing>> ListByGameRoomAsync(int gameRoomId);
+        IEnumerable<Drawing> ListByGameRoom(int gameRoomId);
         
-        Task<IEnumerable<Drawing>> ListByPlayerAsync(int playerId);
+        IEnumerable<Drawing> ListByPlayer(int playerId);
     }
 }

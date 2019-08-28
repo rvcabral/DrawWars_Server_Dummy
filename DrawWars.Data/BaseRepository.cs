@@ -22,16 +22,16 @@ namespace DrawWars.Data
             _config = config;
         }
 
-        public async Task<T> GetAsync(int id)
+        public T Get(int id)
         {
-            return await ExecuteOnConnection(async connection => await connection.GetAsync<T>(id));
+            return ExecuteOnConnection(connection => connection.Get<T>(id));
         }
 
-        public async Task<T> CreateAsync(T target)
+        public T Create(T target)
         {
-            return await ExecuteOnConnection(async connection =>
+            return ExecuteOnConnection(connection =>
             {
-                target.Id = await connection.InsertAsync(target);
+                target.Id = (int)connection.Insert(target);
 
                 return target;
             });

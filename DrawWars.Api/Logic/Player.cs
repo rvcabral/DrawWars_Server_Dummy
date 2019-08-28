@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DrawWars.Api.Logic
 {
     public class Player
     {
+        public int Id { get; set; }
+        public int CurrentThemeId { get; set; }
         public Guid PlayerId { get; set; }
         public string ConnectionId { get; set; }
         public string DeviceId { get; set; }

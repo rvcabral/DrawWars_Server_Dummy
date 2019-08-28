@@ -6,8 +6,8 @@ namespace DrawWars.Data.Contracts
 {
     public interface IGameRoomRepository
     {
-        Task<GameRoom> CreateAsync(GameRoom gameRoom);
+        GameRoom Create(GameRoom gameRoom);
 
-        Task<IEnumerable<GameRoom>> ListByDeviceAsync(string device);
+        IEnumerable<GameRoom> ListByDevice(string device);
     }
 }

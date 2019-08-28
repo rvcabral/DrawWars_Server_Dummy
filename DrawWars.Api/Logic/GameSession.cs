@@ -1,4 +1,8 @@
 ﻿using DrawWars.Api.GameManager;
+using DrawWars.Data;
+using DrawWars.Data.Contracts;
+using DrawWars.Entities;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,20 +13,26 @@ namespace DrawWars.Api.Logic
     public class GameSession
     {
         private const int MaxLotation = 6;
-        
-        public string Room { get; set; }
-        public Guid SessionId { get; set; }
+
         private List<Player> players;
         private object SessionLock = new object();
+        
+        public int RoomID { get; set; }
+
+        public string Room { get; set; }
+        public Guid SessionId { get; set; }
         public string UiClientConnection  { get; set; }
         public string currentTheme { get; set; }
         public DateTime StartMoment { get; set; }
         private bool Started { get; set; }
         private int MaxRoundScore = 0;
         private int Rounds { get; set; }
+
+        private IConfiguration _configuration { get; }
+
         #region ctor
 
-        public GameSession(string room, string uiConnectionId)
+        public GameSession(string room, string uiConnectionId, IConfiguration config)
         {
             Room = room;
             players = new List<Player>();
@@ -30,6 +40,8 @@ namespace DrawWars.Api.Logic
             UiClientConnection = uiConnectionId;
             StartMoment = DateTime.Now;
             Rounds = 3;
+
+            _configuration = config;
         }
 
         #endregion
@@ -52,12 +64,18 @@ namespace DrawWars.Api.Logic
     
         public Dictionary<Guid, List<string>> GetThemes()
         {
-            var themes = new Dictionary<Guid, List<string>>();
-            var random = new Random();
-            players.ForEach(p => themes.Add(p.PlayerId, new List<string> { Themes.ThemesList.ElementAt(random.Next(Themes.ThemesList.Count)) }));
+            var themes = new ThemeRepository(_configuration).ListRandom(players.Count).ToList();
+            var result = new Dictionary<Guid, List<string>>();
 
+            var idx = 0;
+            foreach(var player in players)
+            {
+                var theme = themes[idx];
+                player.CurrentThemeId = theme.Id;
+                result.Add(player.PlayerId, new List<string>() { theme.Text });
+            }
             
-            return themes;
+            return result;
         }
 
         internal object GetPlayerByConnectionIdSafe(string connectionId)
@@ -73,7 +91,7 @@ namespace DrawWars.Api.Logic
             Player player = GetPlayerSafe(playerId);
             if (player == null) return;
 
-            player.Draw = new Draw(draw,theme, playerId);
+            player.Draw = new Draw(draw, theme, playerId);            
         }
 
         public Draw nextDraw()
@@ -153,14 +171,16 @@ namespace DrawWars.Api.Logic
 
 
             } while (!inserted);
+
             return player;
         }
 
         internal List<PlayerResult> GetPlayersScores()
         {
-            var list = new List<PlayerResult>();
-            players.ForEach(p => list.Add(new PlayerResult(p.nickname, p.Points)));
-            return list;
+            return players
+                .Select(p => new PlayerResult(p.nickname, p.Points))
+                .OrderByDescending(pr => pr.score)
+                .ToList();
         }
 
         internal bool AllDrawsSubmitted()
@@ -174,7 +194,25 @@ namespace DrawWars.Api.Logic
         internal bool IsEndOfSession()
         {
             Rounds = Rounds - 1;
-            return Rounds == 0;
+
+            if (Rounds != 0)
+                return false;
+
+            lock (SessionLock)
+            {
+                var scoreRepository = new PlayerScoreRepository(_configuration);
+                players
+                    .Select(p => new PlayerScore()
+                    {
+                        PlayerId = p.Id,
+                        GameRoomId = RoomID,
+                        Score = p.Points
+                    })
+                    .ToList()
+                    .ForEach(ps => scoreRepository.Create(ps));
+            }
+
+            return true;
         }
 
         internal void ResetRounDone()

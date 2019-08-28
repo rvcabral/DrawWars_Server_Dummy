@@ -6,10 +6,10 @@ namespace DrawWars.Data.Contracts
 {
     public interface IPlayerRepository
     {
-        Task<Player> CreateAsync(Player player);
+        Player Create(Player player);
 
-        Task<Player> GetAsync(int id);
+        Player Get(int id);
 
-        Task<IEnumerable<Player>> ListByGameRoomAsync(int gameRoomId);
+        IEnumerable<Player> ListByGameRoom(int gameRoomId);
     }
 }

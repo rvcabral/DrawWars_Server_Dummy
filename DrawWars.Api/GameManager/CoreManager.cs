@@ -1,4 +1,8 @@
 ﻿using DrawWars.Api.Logic;
+using DrawWars.Data;
+using DrawWars.Data.Contracts;
+using DrawWars.Entities;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +19,9 @@ namespace DrawWars.Api.GameManager
 
         private static readonly MemoryCache SessionCache;
         private static readonly Random Random;
-        
+
+        internal static IConfiguration Configuration {  get; set; }
+
         #endregion
 
         #region Static Constructor
@@ -48,7 +54,7 @@ namespace DrawWars.Api.GameManager
 
         private static GameSession GetSessionById(Guid sessionId)
         {
-            return SessionCache[sessionId.ToString()] as GameSession;
+            return SessionCache[sessionId.ToString().ToUpper()] as GameSession;
         }
 
         internal static bool IsPlayerAlreadyRegistered(string room, string connectionId)
@@ -69,7 +75,7 @@ namespace DrawWars.Api.GameManager
 
         private static GameSession GetSessionByRoomCode(string roomCode)
         {
-            if(RoomCodeMap.TryGetValue(roomCode, out string sessionId))
+            if(RoomCodeMap.TryGetValue(roomCode.ToUpper(), out string sessionId))
             {
                 return SessionCache[sessionId] as GameSession;
             }
@@ -87,18 +93,18 @@ namespace DrawWars.Api.GameManager
 
             cacheEntryOptions.RemovedCallback += SessionEndedCallback;
             
-            var cacheItem = new CacheItem(session.SessionId.ToString(), session);
+            var cacheItem = new CacheItem(session.SessionId.ToString().ToUpper(), session);
             if (!SessionCache.Add(cacheItem, cacheEntryOptions))
             {
                 return false;
             }
 
-            if(!RoomCodeMap.TryAdd(session.Room, session.SessionId.ToString()))
+            if(!RoomCodeMap.TryAdd(session.Room.ToUpper(), session.SessionId.ToString()))
             {
                 SessionCache.Remove(session.SessionId.ToString());
                 return false;
             }
-
+            
             return true;
         }
 
@@ -201,15 +207,39 @@ namespace DrawWars.Api.GameManager
             var plr = sess.GetPlayerSafe(context.PlayerId);
             if (plr == null) return false;
             plr.nickname = nickname;
+
+            var newPlayer = new Entities.Player()
+            {
+                PlayerUuid = plr.PlayerId,
+                GameRoomId = sess.RoomID,
+                Name = nickname,
+                DeviceUuid = Guid.Parse(plr.DeviceId)
+            };
+
+            new PlayerRepository(Configuration).Create(newPlayer);
+
+            plr.Id = newPlayer.Id;
+
             return true;
         }
-
         
-
         internal static GameSession RegisterUIClient(string connection)
         {
-            var session = new GameSession(GenerateRoomCode(), connection);
+            var session = new GameSession(GenerateRoomCode(), connection, Configuration);
+
+            var gameRoom = new GameRoom()
+            {
+                Code = session.Room,
+                SessionUuid = session.SessionId,
+                CreationDate = DateTime.Now
+            };
+
+            new GameRoomRepository(Configuration).Create(gameRoom);
+            
+            session.RoomID = gameRoom.Id;
+
             AddSession(session);
+
             return session;
         }
 

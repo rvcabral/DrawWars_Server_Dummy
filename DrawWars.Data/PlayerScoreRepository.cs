@@ -12,11 +12,11 @@ namespace DrawWars.Data
     {
         public PlayerScoreRepository(IConfiguration config) : base(config) { }
 
-        public async Task<IEnumerable<PlayerScore>> GetByGameRoomAsync(int gameRoomId)
+        public IEnumerable<PlayerScore> GetByGameRoom(int gameRoomId)
         {
-            return await ExecuteOnConnection(async connection =>
+            return ExecuteOnConnection(connection =>
             {
-                return await connection.QueryAsync<PlayerScore>(
+                return connection.Query<PlayerScore>(
                     sql: $"SELECT * FROM {nameof(PlayerScore)} WHERE {nameof(PlayerScore.GameRoomId)} = @{nameof(gameRoomId)}",
                     param: new { gameRoomId },
                     commandType: CommandType.Text
@@ -24,11 +24,11 @@ namespace DrawWars.Data
             });
         }
 
-        public async Task<IEnumerable<PlayerScore>> GetByPlayerAsync(int playerId)
+        public IEnumerable<PlayerScore> GetByPlayer(int playerId)
         {
-            return await ExecuteOnConnection(async connection =>
+            return ExecuteOnConnection(connection =>
             {
-                return await connection.QueryAsync<PlayerScore>(
+                return connection.Query<PlayerScore>(
                     sql: $"SELECT * FROM {nameof(PlayerScore)} WHERE {nameof(PlayerScore.PlayerId)} = @{nameof(playerId)}",
                     param: new { playerId },
                     commandType: CommandType.Text
