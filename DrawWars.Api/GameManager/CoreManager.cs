@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading;
 
 namespace DrawWars.Api.GameManager
 {
@@ -43,10 +44,16 @@ namespace DrawWars.Api.GameManager
             RoomCodeMap.Remove(session.Room, out string value);
         }
 
+        internal static void UpdateConnectionId(Context context, string connectionId)
+        {
+            var plr = GetSessionById(context.Session)?.GetPlayerSafe(context.PlayerId);
+            if(plr!=null) plr.ConnectionId = connectionId;
+        }
+
         #endregion
 
         #region Concurrent Safe Util Functions
-        
+
         internal static long GetSessionCount()
         {
             return RoomCodeMap.Count;
@@ -81,6 +88,22 @@ namespace DrawWars.Api.GameManager
             }
 
             return null;
+        }
+
+        internal static void IncrementAllPlayersInteraction(Context context)
+        {
+            IncrementAllPlayersInteraction(context.Session);
+        }
+        internal static void IncrementAllPlayersInteraction(Guid session)
+        {
+            var s = GetSessionById(session);
+            if (s != null)
+            {
+                foreach (Player p in s.GetAllPlayers())
+                {
+                    p.InteractionCounter++;
+                }
+            }
         }
 
         private static bool AddSession(GameSession session)
@@ -193,6 +216,7 @@ namespace DrawWars.Api.GameManager
             if (s == null) throw new Exception($"No such session find. {session}");
             s.ResetPlayerData();
         }
+
         internal static void SetAllRounDone(Guid session)
         {
             var s = GetSessionById(session);
@@ -243,11 +267,34 @@ namespace DrawWars.Api.GameManager
             return session;
         }
 
+        internal static void IncrementPlayerInteraction(Context context)
+        {
+            var sess = GetSessionById(context.Session);
+            if (sess == null) return;
+            var plr = sess.GetPlayerSafe(context.PlayerId);
+            if (plr == null) return;
+            plr.InteractionCounter++;
+        }
+
         internal static bool AllGuessedCorrectly(Context context)
         {
             var sess = GetSessionById(context.Session);
             if (sess == null) return false;
             return sess.AllGuessedCorrectly();
+        }
+
+        internal static int GetPlayerInteractionCount(Context context)
+        {
+            return GetPlayerInteractionCount(context.Session, context.PlayerId);
+        }
+
+        internal static int GetPlayerInteractionCount(Guid session, Guid player)
+        {
+            var sess = GetSessionById(session);
+            if (sess == null) return 0;
+            var plr = sess.GetPlayerSafe(player);
+            if (plr == null) return 0;
+            return plr.InteractionCounter;
         }
 
         internal static List<string> GetContextConnectionIds(Context context)

@@ -13,7 +13,7 @@ namespace DrawWars.Api.Hubs
 
         public async Task Inlist(string room, string deviceId)
         {
-            var res = CoreManager.inlist(room, Context.ConnectionId, deviceId);
+            var res = CoreManager.inlist(room.ToUpper(), Context.ConnectionId, deviceId);
             if (res.Session.Equals(Guid.Empty))
             {
                 await Clients.Caller.SendAsync("NonExistingSession", res.PlayerId);
@@ -21,8 +21,15 @@ namespace DrawWars.Api.Hubs
             else
             {
                 await Clients.Caller.SendAsync("AckSession", res);
+                CoreManager.IncrementPlayerInteraction(res);
             }
             
+        }
+
+        public async Task ConnectionIdMightHaveChanged(Context context)
+        {
+            CoreManager.UpdateConnectionId(context, Context.ConnectionId);
+            return;
         }
 
         public async Task RegisterUIClient()
@@ -34,19 +41,25 @@ namespace DrawWars.Api.Hubs
 
         public async Task SetPlayerNickName(Context context, string nickname)
         {
+            CoreManager.IncrementPlayerInteraction(context);
             Console.WriteLine($"Player {context.PlayerId} from Session {context.Session} has set his nickname to {nickname}");
             var success = CoreManager.SetUserNickName(context, nickname);
             await Clients.Caller.SendAsync("AckNickname");
+            CoreManager.IncrementPlayerInteraction(context);
             string uiConId = CoreManager.GetUiClient(context.Session);
             await Clients.Client(uiConId).SendAsync("NewPlayer", nickname);
         }
 
         public async Task Ready(Context context)
         {
+            CoreManager.IncrementPlayerInteraction(context);
             CoreManager.StartSession(context.Session);
             var playerConnections = CoreManager.GetContextPlayerConnectionId(context);
 
             await Clients.Clients(playerConnections).SendAsync("DrawThemes", CoreManager.GetSession(context.Session).GetThemes());
+            CoreManager.IncrementAllPlayersInteraction(context);
+            
+
             await Clients.Client(CoreManager.GetSession(context.Session).UiClientConnection).SendAsync("DrawThemes", 60);
         }
 
@@ -56,15 +69,13 @@ namespace DrawWars.Api.Hubs
 
         public async Task SetTimesUp(Guid session)
         {
-            var s = CoreManager.GetSession(session);
-            var uiC = s.UiClientConnection;
-            
             await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("TimesUp");
+            CoreManager.IncrementAllPlayersInteraction(session);
         }
 
         public async Task DrawSubmitted(Context context)
         {
-
+            CoreManager.IncrementPlayerInteraction(context);
             if (CoreManager.AllDrawsSubmitted(context))
             {
                 await Clients.Clients(CoreManager.GetUiClient(context.Session)).SendAsync("ReadyToShowDraws", 5);
@@ -81,6 +92,9 @@ namespace DrawWars.Api.Hubs
                 
                 await Clients.Clients(CoreManager.GetContextPlayerConnectionIdExcept(session, nextDraw.Owner)).SendAsync("TryAndGuess");
                 await Clients.Client(owner.ConnectionId).SendAsync("StandBy");
+
+                CoreManager.IncrementAllPlayersInteraction(session);
+
                 await Clients.Client(CoreManager.GetUiClient(session))
                 .SendAsync("ShowDrawing", new
                 {
@@ -91,6 +105,7 @@ namespace DrawWars.Api.Hubs
             else
             {
                 await Clients.All.SendAsync("EndOfGame");
+                CoreManager.IncrementAllPlayersInteraction(session);
             }
         }
 
@@ -98,6 +113,7 @@ namespace DrawWars.Api.Hubs
         {
             
             await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("SeeResults");
+            CoreManager.IncrementAllPlayersInteraction(session);
             await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("SeeResults", CoreManager.GetSession(session).GetPlayersScores());
 
         }
@@ -113,11 +129,13 @@ namespace DrawWars.Api.Hubs
                     CoreManager.ResetRounDone(session);
                     CoreManager.CleanDraws(session);
                     await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("NextRound");
+                    CoreManager.IncrementAllPlayersInteraction(session);
                     await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("NextRound", 5);
                 }
                 else
                 {
                     await Clients.All.SendAsync("EndOfGame");
+                    CoreManager.IncrementAllPlayersInteraction(session);
                 }
             }
         }
@@ -127,12 +145,13 @@ namespace DrawWars.Api.Hubs
         {
             CoreManager.ResetRounDone(session);
             await Clients.Clients(CoreManager.GetContextPlayerConnectionId(session)).SendAsync("DrawThemes", CoreManager.GetSession(session).GetThemes());
+            CoreManager.IncrementAllPlayersInteraction(session);
             await Clients.Client(CoreManager.GetSession(session).UiClientConnection).SendAsync("DrawThemes", 60);
         }
 
         public async Task SendGuess(Context context, string guess)
         {
-
+            CoreManager.IncrementPlayerInteraction(context);
             var currTheme = CoreManager.GetSession(context.Session).currentTheme;
             if(Themes.IsCorrect(currTheme, guess))
             {
@@ -145,6 +164,7 @@ namespace DrawWars.Api.Hubs
                 });
 
                 await Clients.Caller.SendAsync("RightGuess");
+                CoreManager.IncrementPlayerInteraction(context);
                 if (CoreManager.AllGuessedCorrectly(context))
                     await NextGamePhase(context.Session);
             }
@@ -157,10 +177,15 @@ namespace DrawWars.Api.Hubs
                     player = CoreManager.GetSession(context.Session).GetPlayerSafe(context.PlayerId).nickname
                 });
                 await Clients.Caller.SendAsync("WrongGuess");
+                CoreManager.IncrementPlayerInteraction(context);
             }
 
         }
         
+        public async Task InteractionCount(Context context)
+        {
+            await Clients.Caller.SendAsync("InteractionCount", CoreManager.GetPlayerInteractionCount(context));
+        }
         #endregion
 
 
