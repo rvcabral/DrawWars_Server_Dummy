@@ -99,7 +99,7 @@ namespace DrawWars.Api.GameManager
             var s = GetSessionById(session);
             if (s != null)
             {
-                foreach (Player p in s.GetAllPlayers())
+                foreach (var p in s.GetAllPlayers())
                 {
                     p.InteractionCounter++;
                 }
