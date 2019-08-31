@@ -11,7 +11,7 @@ namespace DrawWars.Api.Logic
         public string DeviceId { get; set; }
         public int Points { get; set; }
         public string nickname { get; set; }
-        public int InteractionCounter { get; set; }
+        public int InteractionCounter = 0;
         public Draw Draw { get; set; }
         public bool RoundDone { get; set; }
         public bool GuessedCorrectly { get; set; }

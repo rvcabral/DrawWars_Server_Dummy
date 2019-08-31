@@ -61,7 +61,6 @@ namespace DrawWars.Api
             app.UseCors(builder =>
             {
                 builder.AllowAnyOrigin()
-                //.WithOrigins("http://localhost:8081")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();

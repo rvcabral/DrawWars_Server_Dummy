@@ -182,12 +182,7 @@ namespace DrawWars.Api.Hubs
 
         }
         
-        public async Task InteractionCount(Context context)
-        {
-            await Clients.Caller.SendAsync("InteractionCount", CoreManager.GetPlayerInteractionCount(context));
-        }
+       
         #endregion
-
-
     }
 }

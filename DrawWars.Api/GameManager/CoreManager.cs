@@ -94,23 +94,20 @@ namespace DrawWars.Api.GameManager
         {
             IncrementAllPlayersInteraction(context.Session);
         }
+
         internal static void IncrementAllPlayersInteraction(Guid session)
         {
             var s = GetSessionById(session);
             if (s != null)
-            {
                 foreach (var p in s.GetAllPlayers())
-                {
-                    p.InteractionCounter++;
-                }
-            }
+                    Interlocked.Increment(ref p.InteractionCounter);
         }
 
         private static bool AddSession(GameSession session)
         {
             var cacheEntryOptions = new CacheItemPolicy()
             {
-                SlidingExpiration = TimeSpan.FromMinutes(5),
+                SlidingExpiration = TimeSpan.FromMinutes(10),
                 Priority = CacheItemPriority.NotRemovable,
             };
 
@@ -273,7 +270,7 @@ namespace DrawWars.Api.GameManager
             if (sess == null) return;
             var plr = sess.GetPlayerSafe(context.PlayerId);
             if (plr == null) return;
-            plr.InteractionCounter++;
+            Interlocked.Increment(ref plr.InteractionCounter);
         }
 
         internal static bool AllGuessedCorrectly(Context context)
@@ -318,6 +315,7 @@ namespace DrawWars.Api.GameManager
             if (session == null) throw new Exception($"No such session find. {Session}");
             return session.GetAllPlayersConnections();
         }
+
         internal static List<string> GetContextPlayerConnectionIdExcept(Guid Session, Guid excludePlayerId)
         {
             var session = GetSessionById(Session);
