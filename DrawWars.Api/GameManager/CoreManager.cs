@@ -119,7 +119,7 @@ namespace DrawWars.Api.GameManager
                 return false;
             }
 
-            if(!RoomCodeMap.TryAdd(session.Room.ToUpper(), session.SessionId.ToString()))
+            if(!RoomCodeMap.TryAdd(session.Room.ToUpper(), session.SessionId.ToString().ToUpper()))
             {
                 SessionCache.Remove(session.SessionId.ToString());
                 return false;
