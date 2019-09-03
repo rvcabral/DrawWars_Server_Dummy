@@ -1,5 +1,8 @@
-﻿namespace DrawWars.Entities
+﻿using Dapper.Contrib.Extensions;
+
+namespace DrawWars.Entities
 {
+    [Table("Drawing")]
     public sealed class Drawing : BaseEntity
     {
         public int GameRoomId { get; set; }
