@@ -1,5 +1,7 @@
 using DrawWars.Api.GameManager;
 using DrawWars.Api.Hubs;
+using DrawWars.Api.Models.Settings;
+using DrawWars.Api.Utils;
 using DrawWars.Aws.Extensions;
 using DrawWars.Data;
 using DrawWars.Data.Contracts;
@@ -57,6 +59,7 @@ namespace DrawWars.Api
 
             app.UseMvc();
 
+            ConfigureCrypto();
 
             app.UseCors(builder =>
             {
@@ -81,7 +84,11 @@ namespace DrawWars.Api
             services.AddTransient<IPlayerRepository, PlayerRepository>();
             services.AddTransient<IPlayerScoreRepository, PlayerScoreRepository>();
             services.AddTransient<IThemeRepository, ThemeRepository>();
+            services.AddTransient<IDrawWarsUserRepository, DrawWarsUserRepository>();
         }
+
+        private void ConfigureCrypto() =>
+            CryptoUtils.Settings = Configuration.GetSection("CryptoSettings").Get<CryptoSettings>();
 
         #endregion
     }

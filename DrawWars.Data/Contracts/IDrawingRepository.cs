@@ -11,5 +11,7 @@ namespace DrawWars.Data.Contracts
         IEnumerable<Drawing> ListByGameRoom(int gameRoomId);
         
         IEnumerable<Drawing> ListByPlayer(int playerId);
+
+        IEnumerable<Drawing> ListByUser(int userId);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace DrawWars.Entities
 {
-    [Table("PlayerScore")]
+    [Table("Theme")]
     public sealed class Theme : BaseEntity
     {
         public string Text { get; set; }

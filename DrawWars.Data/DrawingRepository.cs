@@ -36,5 +36,21 @@ namespace DrawWars.Data
                 );
             });
         }
+
+        public IEnumerable<Drawing> ListByUser(int userId)
+        {
+            return ExecuteOnConnection(connection =>
+            {
+                return connection.Query<Drawing>(
+                    sql: @" SELECT Drawing.*
+                            FROM UserDevice
+	                            INNER JOIN Player ON Player.DeviceUuid = UserDevice.DeviceUuid
+	                            INNER JOIN Drawing ON Drawing.PlayerId = Player.Id
+                            WHERE UserDevice.UserId = @userId",
+                    param: new { userId },
+                    commandType: CommandType.Text
+                );
+            });
+        }
     }
 }

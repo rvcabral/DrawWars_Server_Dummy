@@ -4,7 +4,7 @@ using DrawWars.Entities;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace DrawWars.Data
 {
@@ -12,18 +12,19 @@ namespace DrawWars.Data
     {
         public GameRoomRepository(IConfiguration config) : base(config) { }
 
-        public IEnumerable<GameRoom> ListByDevice(string deviceUuid)
+        public List<GameRoom> List(int page, int pageSize)
         {
             return ExecuteOnConnection(connection =>
             {
                 return connection.Query<GameRoom>(
                     sql: $@"SELECT * 
                             FROM GameRoom
-                                INNER JOIN Player ON Player.GameRoomId = GameRoom.Id
-                            WHERE Player.DeviceUuid = @deviceUuid",
-                    param: new { deviceUuid },
+                            ORDER BY CreationDate DESC
+                            OFFSET (@page * @pageSize) ROWS
+                            FETCH NEXT @pageSize ROWS ONLY",
+                    param: new { page, pageSize },
                     commandType: CommandType.Text
-                );
+                ).ToList();
             });
         }
     }

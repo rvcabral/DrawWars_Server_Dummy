@@ -8,6 +8,6 @@ namespace DrawWars.Data.Contracts
     {
         GameRoom Create(GameRoom gameRoom);
 
-        IEnumerable<GameRoom> ListByDevice(string device);
+        List<GameRoom> List(int page, int pageSize);
     }
 }
