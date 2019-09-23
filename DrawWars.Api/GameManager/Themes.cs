@@ -22,7 +22,7 @@ namespace DrawWars.Api.GameManager
 
             foreach(var word in guessWords)
             {
-                if (!guessWords.Contains(word))
+                if (!themeWords.Contains(word))
                     return false;
             }
 
