@@ -70,7 +70,7 @@ namespace DrawWars.Api.Logic
             var idx = 0;
             foreach(var player in players)
             {
-                var theme = themes[idx];
+                var theme = themes[idx++];
                 player.CurrentThemeId = theme.Id;
                 result.Add(player.PlayerId, new List<string>() { theme.Text });
             }
